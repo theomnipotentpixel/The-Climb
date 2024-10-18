@@ -7,15 +7,20 @@ let DEBUG_MODE = true;
 let LEVELS_LOADED = false;
 let CURRENT_LEVEL_JSON = null;
 
-let TILE_SPRITES = {
-    0: "#646464",
-    1: "#FFFFFF"
-};
 
 let TILE_PROPS = {
     0: {collisionType: false},
     1: {collisionType: true},
+    2: {collisionType: true},
+};
+
+let blockSpritePaths = {
+    0: "air.png",
+    1: "filled.png",
+    2: "red.png",
 }
+
+let TILE_SPRITES = {};
 
 let CURRENT_SCREEN = "0,0";
 
@@ -53,16 +58,15 @@ let LevelMap = function(stages){
     }
 }
 
-let Tile = function(x, y, color, properties){
+let Tile = function(x, y, spr, properties){
     this.x = x;
     this.y = y;
     this.props = properties;
-    this.color = color;
+    this.spr = spr;
     this.collisionType = this.props.collisionType;
 
     this.draw = function(){
-        fill(this.color);
-        rect(x*SCALE, y*SCALE, SCALE, SCALE);
+        image(this.spr, this.x * SCALE, this.y * SCALE)
     }
 
     this.isSolid = function(){
@@ -212,6 +216,9 @@ function setup(){
     // for(let i = 0; i < tiles.length; i++){
     //     currentStage[tiles[i].x+","+tiles[i].y] = tiles[i];
     // }
+    for (const [k, v] of Object.entries(blockSpritePaths)) {
+        TILE_SPRITES[k] = loadImage("/sprites/tiles/" + v);
+    }
 }
 
 let currentStage = {
