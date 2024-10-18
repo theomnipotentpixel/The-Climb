@@ -1,0 +1,11 @@
+:root {
+	color-scheme: dark;
+	color: white;
+}
+* {
+    box-sizing: border-box;
+	color: white;
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+}
