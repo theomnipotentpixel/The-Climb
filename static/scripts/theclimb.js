@@ -110,12 +110,6 @@ let Player = function(x, y, color){
         let dx = this.velX * deltaTime;
         let dy = this.velY * deltaTime;
 
-        // this.doCollision();
-
-        // if(this.isOnGround){
-        //     this.velY = 0;
-        // }
-
         if(this.velX < 0){ // LEFT
             if(GetTile(Math.floor((this.x + dx)/SCALE), Math.floor(this.y/SCALE)).isSolid()){
                 this.x = Math.floor((this.x)/SCALE)*SCALE
@@ -187,11 +181,7 @@ let Player = function(x, y, color){
             if(this.isOnGround)
                 this.velY = -this.jumpSpeed;
         }
-        // if(keyIsDown(16)){
-        //     this.velX = Math.clamp(this.velX, -this.maxVelX*2, this.maxVelX*2);
-        // } else {
-            this.velX = Math.clamp(this.velX, -this.maxVelX, this.maxVelX);
-        // }
+        this.velX = Math.clamp(this.velX, -this.maxVelX, this.maxVelX);
 
         this.velY = Math.clamp(this.velY, -this.maxVelY, this.maxVelY);
     }   
@@ -213,9 +203,6 @@ function setup(){
     background(62);
     noStroke();
     frameRate(120);
-    // for(let i = 0; i < tiles.length; i++){
-    //     currentStage[tiles[i].x+","+tiles[i].y] = tiles[i];
-    // }
     for (const [k, v] of Object.entries(blockSpritePaths)) {
         TILE_SPRITES[k] = loadImage("/sprites/tiles/" + v);
     }

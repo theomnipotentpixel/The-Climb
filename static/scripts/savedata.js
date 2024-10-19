@@ -3,5 +3,5 @@ function addSaveData(key, value){
 }
 
 function getSaveData(key, defaultValue){
-    localStorage.getItem(key);
+    localStorage.getItem(key) | defaultValue;
 }
