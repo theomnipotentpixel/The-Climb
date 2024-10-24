@@ -6,6 +6,8 @@ let blockSpritePaths = {
     0: "air.png",
     1: "filled.png",
     2: "red.png",
+    3: "green.png",
+    4: "blue.png",
 }
 
 let blockSprites = {};

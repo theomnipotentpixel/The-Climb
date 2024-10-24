@@ -12,12 +12,16 @@ let TILE_PROPS = {
     0: {collisionType: false},
     1: {collisionType: true},
     2: {collisionType: true},
+    3: {collisionType: true},
+    4: {collisionType: true},
 };
 
 let blockSpritePaths = {
     0: "air.png",
     1: "filled.png",
     2: "red.png",
+    3: "green.png",
+    4: "blue.png",
 }
 
 let TILE_SPRITES = {};
