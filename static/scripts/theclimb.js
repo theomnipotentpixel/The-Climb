@@ -10,23 +10,6 @@ let pos = [0, 0];
 let tileset;
 let TILES = {};
 
-<<<<<<< HEAD
-
-let TILE_PROPS = {
-    0: {collisionType: false},
-    1: {collisionType: true},
-    2: {collisionType: true},
-    3: {collisionType: true},
-    4: {collisionType: true},
-};
-
-let blockSpritePaths = {
-    0: "air.png",
-    1: "filled.png",
-    2: "red.png",
-    3: "green.png",
-    4: "blue.png",
-=======
 let PROPS = {};
 PROPS.fullSolid = {
     solidTop: true,
@@ -45,7 +28,6 @@ PROPS.empty = {
     solidBottom: false,
     solidLeft: false,
     solidRight: false,
->>>>>>> a949c35 (edits)
 }
 
 TILES.getProps = function(id){
