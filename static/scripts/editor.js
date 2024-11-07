@@ -2,19 +2,7 @@ let level = {"0,0":{}};
 let currentScreen = "0,0";
 let SCALE = 24;
 
-<<<<<<< HEAD
-let blockSpritePaths = {
-    0: "air.png",
-    1: "filled.png",
-    2: "red.png",
-    3: "green.png",
-    4: "blue.png",
-}
-
-let blockSprites = {};
-=======
 let tileset;
->>>>>>> a949c35 (edits)
 
 function setup(){
     createCanvas(50*SCALE, 30*SCALE);
