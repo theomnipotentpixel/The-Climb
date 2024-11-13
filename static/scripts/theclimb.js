@@ -103,10 +103,12 @@ let Player = function(x, y, color){
     this.velX = 0;
     this.velY = 0;
     this.maxVelX = 300;
-    this.maxVelY = 1000;
+    this.maxVelY = 2000;
     this.jumpSpeed = 625;
     this.gravity = 1500;
     this.isOnGround = false;
+    this.isLeft = false;
+    this.sprites = loadImage("sprites/player.png");
 
     this.update = function(deltaTime){
         if(deltaTime > 0.1)
@@ -114,7 +116,12 @@ let Player = function(x, y, color){
         this.doInput(deltaTime);
 
         this.isOnGround = false;
-        this.doKinematics(deltaTime);
+        this.doKinematics(deltaTime/6);
+        this.doKinematics(deltaTime/6);
+        this.doKinematics(deltaTime/6);
+        this.doKinematics(deltaTime/6);
+        this.doKinematics(deltaTime/6);
+        this.doKinematics(deltaTime/6);
     }
 
     this.doKinematics = function(deltaTime){
@@ -132,21 +139,23 @@ let Player = function(x, y, color){
                 this.x = Math.floor((this.x)/SCALE)*SCALE
                 dx = 0;
                 this.velX = 0;
-            } else if(TILES.getProps(GetTile(Math.floor((this.x + dx)/SCALE), Math.floor((this.y+SCALE-dy/2)/SCALE))).solidRight){
+            } else if(TILES.getProps(GetTile(Math.floor((this.x + dx)/SCALE), Math.floor((this.y+SCALE-1)/SCALE))).solidRight){
                 this.x = Math.floor((this.x)/SCALE)*SCALE
                 dx = 0;
                 this.velX = 0;
             }
+            this.isLeft = true;
         } else if (this.velX > 0){ // RIGHT
             if(TILES.getProps(GetTile(Math.floor((this.x + dx + SCALE - 1)/SCALE), Math.floor(this.y/SCALE))).solidLeft){
                 this.x = Math.floor((this.x + SCALE - 1)/SCALE)*SCALE
                 dx = 0;
                 this.velX = 0;
-            } else if(TILES.getProps(GetTile(Math.floor((this.x + dx + SCALE - 1)/SCALE), Math.floor((this.y+SCALE-dx/2)/SCALE))).solidLeft){
+            } else if(TILES.getProps(GetTile(Math.floor((this.x + dx + SCALE - 1)/SCALE), Math.floor((this.y+SCALE-1)/SCALE))).solidLeft){
                 this.x = Math.floor((this.x + SCALE - 1)/SCALE)*SCALE
                 dx = 0;
                 this.velX = 0;
             }
+            this.isLeft = false;
         }
         
         // APPLY HERE TO FIX CORNER CLIPS
@@ -154,30 +163,27 @@ let Player = function(x, y, color){
 
         if(this.velY < 0){ // UP
             if(TILES.getProps(GetTile(Math.floor((this.x)/SCALE), Math.floor((this.y+dy)/SCALE))).solidBottom){
-                this.y = Math.floor((this.y)/SCALE)*SCALE
+                this.y = Math.floor((this.y)/SCALE)*SCALE;
                 dy = 0;
                 this.velY = 0;
-            } else if(TILES.getProps(GetTile(Math.floor((this.x+SCALE-dx/2)/SCALE), Math.floor((this.y+dy)/SCALE))).solidBottom){
-                this.y = Math.floor((this.y)/SCALE)*SCALE
+            } else if(TILES.getProps(GetTile(Math.floor((this.x+SCALE-1)/SCALE), Math.floor((this.y+dy)/SCALE))).solidBottom){
+                this.y = Math.floor((this.y)/SCALE)*SCALE;
                 dy = 0;
                 this.velY = 0;
             }
         } else if(this.velY > 0){ // DOWN
-            if(TILES.getProps(GetTile(Math.floor((this.x)/SCALE), Math.floor((this.y+dy+SCALE)/SCALE))).solidTop){
-                this.y = Math.floor((this.y+SCALE-dy)/SCALE)*SCALE
+            if(TILES.getProps(GetTile(Math.floor((this.x)/SCALE), Math.ceil((this.y+dy)/SCALE))).solidTop){
+                this.y = Math.floor((this.y+SCALE-dy)/SCALE)*SCALE;
                 dy = 0;
                 this.isOnGround = true;
                 this.velY = 0;
-            } else if(TILES.getProps(GetTile(Math.floor((this.x+SCALE-1-dx)/SCALE), Math.ceil((this.y-dy+1)/SCALE))).solidTop){
-                this.y = Math.floor((this.y+SCALE-dy)/SCALE)*SCALE
+            } else if(TILES.getProps(GetTile(Math.floor((this.x+SCALE-1)/SCALE), Math.ceil((this.y+dy)/SCALE))).solidTop){
+                this.y = Math.floor((this.y+SCALE-dy)/SCALE)*SCALE;
                 dy = 0;
                 this.isOnGround = true;
                 this.velY = 0;
             }
         }
-
-        // if(this.isOnGround)
-        //     console.log(frameCount)
         
         this.y += dy;
 
@@ -208,18 +214,21 @@ let Player = function(x, y, color){
 
     this.draw = function(){
         noStroke();
-        fill(this.color);
-        rect(this.x, this.y, SCALE, SCALE);
-        fill(0);
-        circle(pos[0], pos[1], 3);
+        if(this.isLeft){
+            image(this.sprites, this.x, this.y, SCALE, SCALE, 0*SCALE, 0*SCALE, SCALE, SCALE);
+        } else {
+            image(this.sprites, this.x, this.y, SCALE, SCALE, 0*SCALE, 1*SCALE, SCALE, SCALE);
+        }
+        // circle(pos[0], pos[1], 3);
     }
 }
 
-let player = new Player(64, 64, "#ff0000");
+let player;
 
 function setup(){
     loadLevelPack();
     createCanvas(SCREEN_WIDTH, SCREEN_HEIGHT);
+    player = new Player(64, 64, "#ff0000");
     tileset = loadImage("/sprites/tiles/default-sharp.png");
     background(62);
     noStroke();
@@ -243,7 +252,7 @@ function draw(){
 
 function screen_playGame(){
     noStroke()
-    player.update(deltaTime/750);
+    player.update(deltaTime/1000);
     for(let i = 0; i <= LAST_TILE_X; i++){
         for(let j = 0; j <= LAST_TILE_Y; j++){
             let curTile = GetTile(i, j);
@@ -256,7 +265,4 @@ function screen_playGame(){
     }
     player.draw();
     stroke(0);
-    for(let i = 0; i < 30; i++){
-        line(0, i*SCALE, SCREEN_WIDTH, i*SCALE)
-    }
 }
