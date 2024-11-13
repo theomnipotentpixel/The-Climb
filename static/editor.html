@@ -9,6 +9,15 @@
 <body>
 	<button onclick="saveLevelData()">Save</button>
 	<button onclick="loadLevelData()">Load</button>
+	<input id="sc" type="text" value="0,0">
+	<button onclick="addScreen()">Add Screen
+	</button>
+	<select id="ssel" onchange="setScreen()">
+		<option value="0,0">0,0</option>
+	</select>
+	<button onclick="PREFIX = 'bg_'">BG</button>
+	<button onclick="PREFIX = ''">MG</button>
+	<button onclick="PREFIX = 'fg_'">FG</button>
     <script src="scripts/p5.js"></script>
     
 	<script src="scripts/editor.js"></script>
