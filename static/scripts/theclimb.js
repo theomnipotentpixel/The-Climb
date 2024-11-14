@@ -1,6 +1,3 @@
-
-
-let CURRENT_SCREEN = [0,0];
 const g = p => {
     const SCALE = 24;
     const SCREEN_HEIGHT = 720; const SCREEN_WIDTH = 720;
@@ -10,7 +7,7 @@ const g = p => {
 
     let LEVELS_LOADED = false;
     let CURRENT_LEVEL_JSON = null;
-    let pos = [0, 0];
+    let CURRENT_SCREEN = [0,0];
     let tileset;
     let TILES = {};
 
