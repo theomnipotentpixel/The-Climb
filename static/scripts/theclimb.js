@@ -1,3 +1,6 @@
+
+
+let CURRENT_SCREEN = [0,0];
 const g = p => {
     const SCALE = 24;
     const SCREEN_HEIGHT = 720; const SCREEN_WIDTH = 720;
@@ -78,8 +81,6 @@ const g = p => {
 
         return PROPS.empty;
     }
-
-    let CURRENT_SCREEN = [0,0];
 
     function loadLevelPack(){
         fetch(location.href + 'levelpacks/levels.json')
@@ -280,22 +281,26 @@ const g = p => {
             let dy = this.velY * deltaTime;
 
             if(this.velX < 0){ // LEFT
-                if(TILES.getProps(GetTile(Math.floor((this.x + dx)/SCALE), Math.floor(this.y/SCALE))).solidRight){
+                if(TILES.getProps(GetTile(Math.floor((this.x + dx)/SCALE), Math.floor(this.y/SCALE))).solidRight ||
+                TILES.getProps(GetFG(Math.floor((this.x + dx)/SCALE), Math.floor(this.y/SCALE))).solidRight){
                     this.x = Math.floor((this.x)/SCALE)*SCALE
                     dx = 0;
                     this.velX = 0;
-                } else if(TILES.getProps(GetTile(Math.floor((this.x + dx)/SCALE), Math.floor((this.y+SCALE-1)/SCALE))).solidRight){
+                } else if(TILES.getProps(GetTile(Math.floor((this.x + dx)/SCALE), Math.floor((this.y+SCALE-1)/SCALE))).solidRight ||
+                TILES.getProps(GetFG(Math.floor((this.x + dx)/SCALE), Math.floor((this.y+SCALE-1)/SCALE))).solidRight){
                     this.x = Math.floor((this.x)/SCALE)*SCALE
                     dx = 0;
                     this.velX = 0;
                 }
                 this.isLeft = true;
             } else if (this.velX > 0){ // RIGHT
-                if(TILES.getProps(GetTile(Math.floor((this.x + dx + SCALE - 1)/SCALE), Math.floor(this.y/SCALE))).solidLeft){
+                if(TILES.getProps(GetTile(Math.floor((this.x + dx + SCALE - 1)/SCALE), Math.floor(this.y/SCALE))).solidLeft ||
+                TILES.getProps(GetFG(Math.floor((this.x + dx + SCALE - 1)/SCALE), Math.floor(this.y/SCALE))).solidLeft){
                     this.x = Math.floor((this.x + SCALE - 1)/SCALE)*SCALE
                     dx = 0;
                     this.velX = 0;
-                } else if(TILES.getProps(GetTile(Math.floor((this.x + dx + SCALE - 1)/SCALE), Math.floor((this.y+SCALE-1)/SCALE))).solidLeft){
+                } else if(TILES.getProps(GetTile(Math.floor((this.x + dx + SCALE - 1)/SCALE), Math.floor((this.y+SCALE-1)/SCALE))).solidLeft ||
+                TILES.getProps(GetFG(Math.floor((this.x + dx + SCALE - 1)/SCALE), Math.floor((this.y+SCALE-1)/SCALE))).solidLeft){
                     this.x = Math.floor((this.x + SCALE - 1)/SCALE)*SCALE
                     dx = 0;
                     this.velX = 0;
@@ -307,22 +312,26 @@ const g = p => {
             this.x += dx;
 
             if(this.velY < 0){ // UP
-                if(TILES.getProps(GetTile(Math.floor((this.x)/SCALE), Math.floor((this.y+dy)/SCALE))).solidBottom){
+                if(TILES.getProps(GetTile(Math.floor((this.x)/SCALE), Math.floor((this.y+dy)/SCALE))).solidBottom ||
+                TILES.getProps(GetFG(Math.floor((this.x)/SCALE), Math.floor((this.y+dy)/SCALE))).solidBottom){
                     this.y = Math.floor((this.y)/SCALE)*SCALE;
                     dy = 0;
                     this.velY = 0;
-                } else if(TILES.getProps(GetTile(Math.floor((this.x+SCALE-1)/SCALE), Math.floor((this.y+dy)/SCALE))).solidBottom){
+                } else if(TILES.getProps(GetTile(Math.floor((this.x+SCALE-1)/SCALE), Math.floor((this.y+dy)/SCALE))).solidBottom ||
+                TILES.getProps(GetFG(Math.floor((this.x+SCALE-1)/SCALE), Math.floor((this.y+dy)/SCALE))).solidBottom){
                     this.y = Math.floor((this.y)/SCALE)*SCALE;
                     dy = 0;
                     this.velY = 0;
                 }
             } else if(this.velY > 0){ // DOWN
-                if(TILES.getProps(GetTile(Math.floor((this.x)/SCALE), Math.ceil((this.y+dy)/SCALE))).solidTop){
+                if(TILES.getProps(GetTile(Math.floor((this.x)/SCALE), Math.ceil((this.y+dy)/SCALE))).solidTop ||
+                TILES.getProps(GetFG(Math.floor((this.x)/SCALE), Math.ceil((this.y+dy)/SCALE))).solidTop){
                     this.y = Math.floor((this.y+SCALE-dy)/SCALE)*SCALE;
                     dy = 0;
                     this.isOnGround = true;
                     this.velY = 0;
-                } else if(TILES.getProps(GetTile(Math.floor((this.x+SCALE-1)/SCALE), Math.ceil((this.y+dy)/SCALE))).solidTop){
+                } else if(TILES.getProps(GetTile(Math.floor((this.x+SCALE-1)/SCALE), Math.ceil((this.y+dy)/SCALE))).solidTop ||
+                TILES.getProps(GetFG(Math.floor((this.x+SCALE-1)/SCALE), Math.ceil((this.y+dy)/SCALE))).solidTop){
                     this.y = Math.floor((this.y+SCALE-dy)/SCALE)*SCALE;
                     dy = 0;
                     this.isOnGround = true;
@@ -374,12 +383,13 @@ const g = p => {
 
     let currentScreen = "play";
 
-
+    let backgroundSprite;
     p.setup = function(){
         loadLevelPack();
         p.createCanvas(SCREEN_WIDTH, SCREEN_HEIGHT);
         player = new Player(24, 620, "#ff0000");
         tileset = p.loadImage("/sprites/tiles/default-sharp.png");
+        backgroundSprite = p.loadImage("/sprites/sky.png");
         p.background(62);
         p.noStroke();
         p.frameRate(120);
@@ -387,7 +397,6 @@ const g = p => {
 
     p.draw = function(){
         if(!LEVELS_LOADED) return;
-        p.background(62);
         switch(currentScreen){
             case "play":
                 screen_playGame();
@@ -397,6 +406,8 @@ const g = p => {
 
     function screen_playGame(){
         p.noStroke()
+        p.background(0x11, 0x1d, 0x35)
+        p.image(backgroundSprite, 0, 0, 720, 720, 0, 960-360+CURRENT_SCREEN[1]*40, 360, 360)
         player.update(p.deltaTime/1000);
         for(let i = 0; i <= LAST_TILE_X; i++){
             for(let j = 0; j <= LAST_TILE_Y; j++){

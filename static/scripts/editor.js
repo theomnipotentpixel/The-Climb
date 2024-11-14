@@ -16,11 +16,6 @@ let tileset;
 function setup(){
     createCanvas(50*SCALE, 30*SCALE);
     tileset = loadImage("/sprites/tiles/default-sharp.png");
-    // for(let x = 0; x < 8; x++){
-    //     for(let y = 0; y < tileset.height/SCALE; y++){
-    //         tiles[(x+y*8)] = tileset.get(0, 0, SCALE, SCALE);
-    //     }
-    // }
     for (let element of document.getElementsByClassName("p5Canvas")) {
         element.addEventListener("contextmenu", (e) => e.preventDefault());
     }
