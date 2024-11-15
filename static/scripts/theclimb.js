@@ -1,4 +1,24 @@
 const g = p => {
+    let CONFIG = localStorage.getItem("config");
+    let DEFAULT_CONFIG = {
+        KEYS: {
+            MOVE_LEFT: [p.LEFT_ARROW, 65],
+            MOVE_RIGHT: [p.RIGHT_ARROW, 68],
+            MOVE_JUMP: [p.UP_ARROW, 87],
+            MOVE_DOWN: [p.DOWN_ARROW, 83]
+        }
+    };
+    if(CONFIG == null){
+        CONFIG = JSON.parse(JSON.stringify(DEFAULT_CONFIG))
+    } else
+        try{
+            CONFIG = JSON.parse(CONFIG);
+        } catch {
+            CONFIG = JSON.parse(JSON.stringify(DEFAULT_CONFIG))
+        }
+
+    let IS_PRESSED = key => p.keyIsDown(key);
+
     const SCALE = 24;
     const SCREEN_HEIGHT = 720; const SCREEN_WIDTH = 720;
     const LAST_TILE_X = SCREEN_WIDTH / SCALE - 1;
@@ -17,18 +37,21 @@ const g = p => {
         solidBottom: true,
         solidLeft: true,
         solidRight: true,
+        isSemisolid: false,
     }
     PROPS.bridge = {
         solidTop: true,
         solidBottom: false,
         solidLeft: false,
         solidRight: false,
+        isSemisolid: true,
     }
     PROPS.empty = {
         solidTop: false,
         solidBottom: false,
         solidLeft: false,
         solidRight: false,
+        isSemisolid: false,
     }
 
     let ANIMATIONS = {
@@ -321,14 +344,22 @@ const g = p => {
                     this.velY = 0;
                 }
             } else if(this.velY > 0){ // DOWN
-                if(TILES.getProps(GetTile(Math.floor((this.x)/SCALE), Math.ceil((this.y+dy)/SCALE))).solidTop ||
-                TILES.getProps(GetFG(Math.floor((this.x)/SCALE), Math.ceil((this.y+dy)/SCALE))).solidTop){
+                let t1m = TILES.getProps(GetTile(Math.floor((this.x)/SCALE), Math.ceil((this.y+dy)/SCALE)));
+                let t1f = TILES.getProps(GetFG(Math.floor((this.x)/SCALE), Math.ceil((this.y+dy)/SCALE)));
+                let t2m = TILES.getProps(GetTile(Math.floor((this.x+SCALE-1)/SCALE), Math.ceil((this.y+dy)/SCALE)));
+                let t2f = TILES.getProps(GetFG(Math.floor((this.x+SCALE-1)/SCALE), Math.ceil((this.y+dy)/SCALE)));
+                if(
+                    (t1m.solidTop && !(t1m.isSemisolid && !t1m.solidBottom && this.downIsPressed)) ||
+                    (t1f.solidTop && !(t1m.isSemisolid && !t1m.solidBottom && this.downIsPressed))
+                ){
                     this.y = Math.floor((this.y+SCALE-dy)/SCALE)*SCALE;
                     dy = 0;
                     this.isOnGround = true;
                     this.velY = 0;
-                } else if(TILES.getProps(GetTile(Math.floor((this.x+SCALE-1)/SCALE), Math.ceil((this.y+dy)/SCALE))).solidTop ||
-                TILES.getProps(GetFG(Math.floor((this.x+SCALE-1)/SCALE), Math.ceil((this.y+dy)/SCALE))).solidTop){
+                } else if(
+                    (t2m.solidTop && !(t2m.isSemisolid && !t2m.solidBottom && this.downIsPressed)) ||
+                    (t2f.solidTop && !(t2m.isSemisolid && !t2m.solidBottom && this.downIsPressed))
+                ){
                     this.y = Math.floor((this.y+SCALE-dy)/SCALE)*SCALE;
                     dy = 0;
                     this.isOnGround = true;
@@ -341,11 +372,11 @@ const g = p => {
         }
 
         this.doInput = function(deltaTime){
-            if (p.keyIsDown(p.LEFT_ARROW) == true || p.keyIsDown(65) == true) {
+            if (CONFIG.KEYS.MOVE_LEFT.some(IS_PRESSED)) {
                 if(this.velX > 0)
                     this.velX = 0;
                 this.velX -= this.maxVelX*deltaTime*8;
-            } else if (p.keyIsDown(p.RIGHT_ARROW) == true || p.keyIsDown(68) == true) {
+            } else if (CONFIG.KEYS.MOVE_RIGHT.some(IS_PRESSED)) {
                 if(this.velX < 0)
                     this.velX = 0;
                 this.velX += this.maxVelX*deltaTime*8;
@@ -354,10 +385,16 @@ const g = p => {
             }
 
 
-            if (p.keyIsDown(p.UP_ARROW) == true || p.keyIsDown(87) == true) {
+            if (CONFIG.KEYS.MOVE_JUMP.some(IS_PRESSED)) {
                 if(this.isOnGround)
                     this.velY = -this.jumpSpeed;
             }
+
+            this.downIsPressed = false;
+
+            if(CONFIG.KEYS.MOVE_DOWN.some(IS_PRESSED))
+                this.downIsPressed = true;
+            
             this.velX = Math.clamp(this.velX, -this.maxVelX, this.maxVelX);
 
             this.velY = Math.clamp(this.velY, -this.maxVelY, this.maxVelY);
@@ -389,7 +426,7 @@ const g = p => {
         backgroundSprite = p.loadImage("/sprites/sky.png");
         p.background(62);
         p.noStroke();
-        p.frameRate(120);
+        p.frameRate(60);
     }
 
     p.draw = function(){
@@ -440,6 +477,9 @@ const g = p => {
         if(p.frameCount % 5 == 0){
             doAnims();
         }
+        if(p.frameCount % 60 == 0){
+            onSave();
+        }
     }
 
     function doAnims(){
@@ -460,6 +500,14 @@ const g = p => {
                 }
             }
         }
+    }
+
+    function onLoad(){
+
+    }
+
+    function onSave(){
+        localStorage.setItem("config", JSON.stringify(CONFIG));
     }
 }
 
