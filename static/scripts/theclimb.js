@@ -38,6 +38,7 @@ const g = p => {
         solidLeft: true,
         solidRight: true,
         isSemisolid: false,
+        isSlippery: false,
     }
     PROPS.bridge = {
         solidTop: true,
@@ -45,6 +46,7 @@ const g = p => {
         solidLeft: false,
         solidRight: false,
         isSemisolid: true,
+        isSlippery: false,
     }
     PROPS.empty = {
         solidTop: false,
@@ -52,6 +54,23 @@ const g = p => {
         solidLeft: false,
         solidRight: false,
         isSemisolid: false,
+        isSlippery: false,
+    }
+    PROPS.slippery = {
+        solidTop: false,
+        solidBottom: false,
+        solidLeft: false,
+        solidRight: false,
+        isSemisolid: false,
+        isSlippery: true,
+    }
+    PROPS.slipperyBridge = {
+        solidTop: true,
+        solidBottom: false,
+        solidLeft: false,
+        solidRight: false,
+        isSemisolid: true,
+        isSlippery: true,
     }
 
     let ANIMATIONS = {
@@ -249,7 +268,7 @@ const g = p => {
 
         this.velX = 0;
         this.velY = 0;
-        this.maxVelX = 300;
+        this.maxVelX = 350;
         this.maxVelY = 2000;
         this.jumpSpeed = 625;
         this.gravity = 1500;
@@ -352,6 +371,7 @@ const g = p => {
                     (t1m.solidTop && !(t1m.isSemisolid && !t1m.solidBottom && this.downIsPressed)) ||
                     (t1f.solidTop && !(t1m.isSemisolid && !t1m.solidBottom && this.downIsPressed))
                 ){
+                    this.onIce = t1m.isSlippery || t1f.isSlippery;
                     this.y = Math.floor((this.y+SCALE-dy)/SCALE)*SCALE;
                     dy = 0;
                     this.isOnGround = true;
@@ -360,6 +380,7 @@ const g = p => {
                     (t2m.solidTop && !(t2m.isSemisolid && !t2m.solidBottom && this.downIsPressed)) ||
                     (t2f.solidTop && !(t2m.isSemisolid && !t2m.solidBottom && this.downIsPressed))
                 ){
+                    this.onIce = t2m.isSlippery || t2f.isSlippery;
                     this.y = Math.floor((this.y+SCALE-dy)/SCALE)*SCALE;
                     dy = 0;
                     this.isOnGround = true;
@@ -373,15 +394,21 @@ const g = p => {
 
         this.doInput = function(deltaTime){
             if (CONFIG.KEYS.MOVE_LEFT.some(IS_PRESSED)) {
-                if(this.velX > 0)
-                    this.velX = 0;
-                this.velX -= this.maxVelX*deltaTime*8;
+                // if(this.velX > 0)
+                //     this.velX = 0;
+                this.velX -= this.maxVelX*deltaTime*4;
             } else if (CONFIG.KEYS.MOVE_RIGHT.some(IS_PRESSED)) {
-                if(this.velX < 0)
-                    this.velX = 0;
-                this.velX += this.maxVelX*deltaTime*8;
+                // if(this.velX < 0)
+                //     this.velX = 0;
+                this.velX += this.maxVelX*deltaTime*4;
             } else {
-                this.velX = 0;
+                if(!this.onIce)
+                    if(this.velX > 0)
+                        this.velX -= this.maxVelX*deltaTime*8;
+                    else if(this.velX < 0)
+                        this.velX += this.maxVelX*deltaTime*8;
+                if(Math.abs(this.velX) < this.maxVelX*deltaTime*4)
+                    this.velX = 0;
             }
 
 
@@ -426,7 +453,7 @@ const g = p => {
         backgroundSprite = p.loadImage("/sprites/sky.png");
         p.background(62);
         p.noStroke();
-        p.frameRate(60);
+        p.frameRate(120);
     }
 
     p.draw = function(){
@@ -440,8 +467,9 @@ const g = p => {
 
     function screen_playGame(){
         p.noStroke()
-        p.background(0x11, 0x1d, 0x35)
-        p.image(backgroundSprite, 0, 0, 720, 720, 0, 960-360+CURRENT_SCREEN[1]*40, 360, 360)
+        p.background(0x11, 0x1d, 0x35);
+        p.image(backgroundSprite, 0, 0, 720, 720, 0, 960-360+CURRENT_SCREEN[1]*40, 360, 360);
+        handleTouches();
         player.update(p.deltaTime/1000);
         for(let i = 0; i <= LAST_TILE_X; i++){
             for(let j = 0; j <= LAST_TILE_Y; j++){
@@ -479,6 +507,12 @@ const g = p => {
         }
         if(p.frameCount % 60 == 0){
             onSave();
+        }
+    }
+
+    function handleTouches(){
+        for(let touch of p.touches){
+            
         }
     }
 
