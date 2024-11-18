@@ -8,6 +8,12 @@ const g = p => {
             MOVE_DOWN: [p.DOWN_ARROW, 83]
         }
     };
+    let TOUCHES = {
+        left: false,
+        right: false,
+        up: false,
+        down: false
+    }
     if(CONFIG == null){
         CONFIG = JSON.parse(JSON.stringify(DEFAULT_CONFIG))
     } else
@@ -393,11 +399,11 @@ const g = p => {
         }
 
         this.doInput = function(deltaTime){
-            if (CONFIG.KEYS.MOVE_LEFT.some(IS_PRESSED)) {
+            if (CONFIG.KEYS.MOVE_LEFT.some(IS_PRESSED) || TOUCHES.left) {
                 // if(this.velX > 0)
                 //     this.velX = 0;
                 this.velX -= this.maxVelX*deltaTime*4;
-            } else if (CONFIG.KEYS.MOVE_RIGHT.some(IS_PRESSED)) {
+            } else if (CONFIG.KEYS.MOVE_RIGHT.some(IS_PRESSED) || TOUCHES.right) {
                 // if(this.velX < 0)
                 //     this.velX = 0;
                 this.velX += this.maxVelX*deltaTime*4;
@@ -412,14 +418,14 @@ const g = p => {
             }
 
 
-            if (CONFIG.KEYS.MOVE_JUMP.some(IS_PRESSED)) {
+            if (CONFIG.KEYS.MOVE_JUMP.some(IS_PRESSED) || TOUCHES.up) {
                 if(this.isOnGround)
                     this.velY = -this.jumpSpeed;
             }
 
             this.downIsPressed = false;
 
-            if(CONFIG.KEYS.MOVE_DOWN.some(IS_PRESSED))
+            if(CONFIG.KEYS.MOVE_DOWN.some(IS_PRESSED) || TOUCHES.down)
                 this.downIsPressed = true;
             
             this.velX = Math.clamp(this.velX, -this.maxVelX, this.maxVelX);
@@ -502,6 +508,15 @@ const g = p => {
                 p.image(tileset, i*SCALE, j*SCALE, SCALE, SCALE, iX*SCALE, iY*SCALE, SCALE, SCALE);
             }
         }
+        if(DEBUG_MODE){
+            p.stroke(0);
+            p.noFill();
+            // p.line(0, SCREEN_HEIGHT-180, SCREEN_WIDTH, SCREEN_HEIGHT-180);
+            p.rect(0, SCREEN_HEIGHT-180, SCREEN_WIDTH/4, 180);
+            p.rect(SCREEN_WIDTH/4, SCREEN_HEIGHT-180, SCREEN_WIDTH/4, 180);
+            p.rect(SCREEN_WIDTH/4*2, SCREEN_HEIGHT-180, SCREEN_WIDTH/4, 180);
+            p.rect(SCREEN_WIDTH/4*3, SCREEN_HEIGHT-180, SCREEN_WIDTH/4, 180);
+        }
         if(p.frameCount % 5 == 0){
             doAnims();
         }
@@ -511,8 +526,24 @@ const g = p => {
     }
 
     function handleTouches(){
+        TOUCHES = {
+            left: false,
+            right: false,
+            up: false,
+            down: false
+        };
         for(let touch of p.touches){
-            
+            if(touch.y > SCREEN_HEIGHT-180){
+                if(touch.x < SCREEN_WIDTH/4){
+                    TOUCHES.left = true;
+                } else if(touch.x < SCREEN_WIDTH/2){
+                    TOUCHES.right = true;
+                } else if(touch.x < SCREEN_WIDTH/4*3){
+                    TOUCHES.down = true;
+                } else if(touch.x < SCREEN_WIDTH){
+                    TOUCHES.up = true;
+                }
+            }
         }
     }
 
