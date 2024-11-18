@@ -63,10 +63,10 @@ const g = p => {
         isSlippery: false,
     }
     PROPS.slippery = {
-        solidTop: false,
-        solidBottom: false,
-        solidLeft: false,
-        solidRight: false,
+        solidTop: true,
+        solidBottom: true,
+        solidLeft: true,
+        solidRight: true,
         isSemisolid: false,
         isSlippery: true,
     }
@@ -121,6 +121,9 @@ const g = p => {
         if(id >= 120 && id <= 123)
             return PROPS.fullSolid;
 
+        if(id >= 162 && id <= 165)
+            return PROPS.slippery;
+
         if(id == 48 || id == 144)
             return PROPS.bridge;
 
@@ -128,9 +131,16 @@ const g = p => {
     }
 
     function loadLevelPack(){
-        fetch(location.href + 'levelpacks/levels.json')
-        .then((response) => response.json())
-        .then((json) => {CURRENT_LEVEL_JSON = new LevelMap(json); LEVELS_LOADED = true;});
+        if(!DEBUG_MODE){
+            LEVELS_LOADED = false;
+            fetch(location.href + 'levelpacks/levels.json')
+            .then((response) => response.json())
+            .then((json) => {CURRENT_LEVEL_JSON = new LevelMap(json); LEVELS_LOADED = true;});
+        } else {
+            LEVELS_LOADED = false;
+            CURRENT_LEVEL_JSON = new LevelMap(JSON.parse(localStorage.getItem("save")));
+            LEVELS_LOADED = true;
+        }
     }
 
     function GetTile(x, y){
