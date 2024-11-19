@@ -451,6 +451,18 @@ const g = p => {
                 p.image(this.sprites, this.x, this.y, SCALE, SCALE, 0*SCALE, 1*SCALE, SCALE, SCALE);
             }
         }
+        
+        this.saveData = function(){
+            return {
+                x: this.x,
+                y: this.y
+            };
+        }
+
+        this.loadData = function(data){
+            this.x = data.x;
+            this.y = data.y;
+        }
     }
 
     let player;
@@ -470,6 +482,7 @@ const g = p => {
         p.background(62);
         p.noStroke();
         p.frameRate(120);
+        onLoad();
     }
 
     p.draw = function(){
@@ -578,7 +591,7 @@ const g = p => {
     }
 
     function onLoad(){
-
+        
     }
 
     function onSave(){
