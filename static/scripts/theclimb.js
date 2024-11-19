@@ -29,7 +29,7 @@ const g = p => {
     const SCREEN_HEIGHT = 720; const SCREEN_WIDTH = 720;
     const LAST_TILE_X = SCREEN_WIDTH / SCALE - 1;
     const LAST_TILE_Y = SCREEN_HEIGHT / SCALE - 1;
-    let DEBUG_MODE = true;
+    let DEBUG_MODE = false;
 
     let LEVELS_LOADED = false;
     let CURRENT_LEVEL_JSON = null;
@@ -135,7 +135,14 @@ const g = p => {
             LEVELS_LOADED = false;
             fetch(location.href + 'levelpacks/levels.json')
             .then((response) => response.json())
-            .then((json) => {CURRENT_LEVEL_JSON = new LevelMap(json); LEVELS_LOADED = true;});
+            .then((levels) => {
+                fetch(location.href + "levelpacks/" + levels[0].path)
+                .then((response) => response.json())
+                .then((levelData) => {
+                    CURRENT_LEVEL_JSON = new LevelMap(levelData);
+                    LEVELS_LOADED = true;
+                })
+            });
         } else {
             LEVELS_LOADED = false;
             CURRENT_LEVEL_JSON = new LevelMap(JSON.parse(localStorage.getItem("save")));
@@ -571,7 +578,6 @@ const g = p => {
     }
 
     function doAnims(){
-        player.update(p.deltaTime/1000);
         for(let i = 0; i <= LAST_TILE_X; i++){
             for(let j = 0; j <= LAST_TILE_Y; j++){
                 let curTile = GetTile(i, j);
