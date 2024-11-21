@@ -747,15 +747,15 @@ const g = p => {
     let backgroundSprite;
     p.preload = function(){
         for(let [k, v] of Object.entries(SOUND_PATHS)){
-            SOUNDS[k] = p.loadSound("/sounds/" + v);
+            SOUNDS[k] = p.loadSound("sounds/" + v);
         }
     }
     p.setup = function(){
         loadLevelPack();
         p.createCanvas(SCREEN_WIDTH, SCREEN_HEIGHT);
         player = new Player(24, 620, "#ff0000");
-        tileset = p.loadImage("/sprites/tiles/default-sharp.png");
-        backgroundSprite = p.loadImage("/sprites/sky.png");
+        tileset = p.loadImage("sprites/tiles/default-sharp.png");
+        backgroundSprite = p.loadImage("sprites/sky.png");
         p.background(62);
         p.noStroke();
         p.frameRate(120);
