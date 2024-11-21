@@ -33,7 +33,7 @@ const g = p => {
     const SCREEN_HEIGHT = 720; const SCREEN_WIDTH = 720;
     const LAST_TILE_X = SCREEN_WIDTH / SCALE - 1;
     const LAST_TILE_Y = SCREEN_HEIGHT / SCALE - 1;
-    let DEBUG_MODE = true;
+    let DEBUG_MODE = false;
 
     let LEVELS_LOADED = false;
     let CURRENT_LEVEL_JSON = null;
