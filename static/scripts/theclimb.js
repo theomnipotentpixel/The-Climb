@@ -17,7 +17,8 @@ const g = p => {
     let SOUND_PATHS = {
         coin: "coin.wav",
         bounce: "bounce.wav",
-        sunglasses: "not_alone_sunglasses.mp3"
+        sunglasses: "not_alone_sunglasses.mp3",
+        jump: "jump.wav"
     }
     let SOUNDS = {};
     if(CONFIG == null){
@@ -119,7 +120,6 @@ const g = p => {
         changeTo: 226,
         isBouncy: true,
         bounceFactor: 625*1.5,
-        // sound: "bounce"
     }
 
     PROPS.sunglasses = {
@@ -646,8 +646,10 @@ const g = p => {
                     this.velY = 0;
                     if(t1m.isBouncy){
                         this.velY = -t1m.bounceFactor;
+                        SOUNDS.bounce.play();
                     } else if(t1f.isBouncy){
                         this.velY = -t1f.bounceFactor;
+                        SOUNDS.bounce.play();
                     }
                 } else if(
                     (t2m.solidTop && !(t2m.isSemisolid && !t2m.solidBottom && this.downIsPressed)) ||
@@ -660,8 +662,10 @@ const g = p => {
                     this.velY = 0;
                     if(t2m.isBouncy){
                         this.velY = -t2m.bounceFactor;
+                        SOUNDS.bounce.play();
                     } else if(t2f.isBouncy){
                         this.velY = -t2f.bounceFactor;
+                        SOUNDS.bounce.play();
                     }
                 }
             }
@@ -695,8 +699,10 @@ const g = p => {
 
 
             if (CONFIG.KEYS.MOVE_JUMP.some(IS_PRESSED) || TOUCHES.up) {
-                if(this.isOnGround)
+                if(this.isOnGround){
                     this.velY = -this.jumpSpeed;
+                    SOUNDS.jump.play()
+                }
             }
 
             this.downIsPressed = false;
