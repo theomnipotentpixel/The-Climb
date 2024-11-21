@@ -39,9 +39,9 @@ function draw(){
             }
         }
     }
-    image(tileset, 31*SCALE, 0)
+    image(tileset, 31*SCALE, 0);
     fill(255, 0, 0);
-    rect(728, 0, 8, height)
+    rect(728, 0, 8, height);
 }
 
 function setBlock(blockX, blockY, block){

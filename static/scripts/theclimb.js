@@ -29,7 +29,7 @@ const g = p => {
     const SCREEN_HEIGHT = 720; const SCREEN_WIDTH = 720;
     const LAST_TILE_X = SCREEN_WIDTH / SCALE - 1;
     const LAST_TILE_Y = SCREEN_HEIGHT / SCALE - 1;
-    let DEBUG_MODE = false;
+    let DEBUG_MODE = true;
 
     let LEVELS_LOADED = false;
     let CURRENT_LEVEL_JSON = null;
@@ -45,6 +45,7 @@ const g = p => {
         solidRight: true,
         isSemisolid: false,
         isSlippery: false,
+        dissapearOnTouch: false,
     }
     PROPS.bridge = {
         solidTop: true,
@@ -53,6 +54,7 @@ const g = p => {
         solidRight: false,
         isSemisolid: true,
         isSlippery: false,
+        dissapearOnTouch: false,
     }
     PROPS.empty = {
         solidTop: false,
@@ -61,6 +63,7 @@ const g = p => {
         solidRight: false,
         isSemisolid: false,
         isSlippery: false,
+        dissapearOnTouch: false,
     }
     PROPS.slippery = {
         solidTop: true,
@@ -69,6 +72,7 @@ const g = p => {
         solidRight: true,
         isSemisolid: false,
         isSlippery: true,
+        dissapearOnTouch: false,
     }
     PROPS.slipperyBridge = {
         solidTop: true,
@@ -77,9 +81,20 @@ const g = p => {
         solidRight: false,
         isSemisolid: true,
         isSlippery: true,
+        dissapearOnTouch: false,
     }
 
-    let ANIMATIONS = {
+    PROPS.coin = {
+        solidTop: false,
+        solidBottom: false,
+        solidLeft: false,
+        solidRight: false,
+        isSemisolid: false,
+        isSlippery: false,
+        dissapearOnTouch: true,
+    }
+
+    let ANIMATIONS_5 = {
         20: 21,
         21: 64,
         64: 65,
@@ -88,7 +103,12 @@ const g = p => {
         28: 29,
         29: 30,
         30: 31,
-        31: 28
+        31: 28,
+    }
+
+    let ANIMATIONS_20 = {
+        160: 161,
+        161: 160,
     }
 
     TILES.getProps = function(id){
@@ -126,6 +146,9 @@ const g = p => {
 
         if(id == 48 || id == 144)
             return PROPS.bridge;
+
+        if(id == 160 || id == 161)
+            return PROPS.coin;
 
         return PROPS.empty;
     }
@@ -343,6 +366,19 @@ const g = p => {
             let dy = this.velY * deltaTime;
 
             if(this.velX < 0){ // LEFT
+                if(TILES.getProps(GetTile(Math.floor((this.x + dx)/SCALE), Math.floor(this.y/SCALE))).dissapearOnTouch){
+                    CURRENT_LEVEL_JSON.setTile(CURRENT_SCREEN, Math.floor((this.x + dx)/SCALE), Math.floor(this.y/SCALE), undefined);
+                }
+                if(TILES.getProps(GetFG(Math.floor((this.x + dx)/SCALE), Math.floor(this.y/SCALE))).dissapearOnTouch){
+                    CURRENT_LEVEL_JSON.setFG(CURRENT_SCREEN, Math.floor((this.x + dx)/SCALE), Math.floor(this.y/SCALE), undefined);
+                }
+                if(TILES.getProps(GetTile(Math.floor((this.x + dx)/SCALE), Math.floor((this.y+SCALE-1)/SCALE))).dissapearOnTouch){
+                    CURRENT_LEVEL_JSON.setTile(CURRENT_SCREEN, Math.floor((this.x + dx)/SCALE), Math.floor((this.y+SCALE-1)/SCALE), undefined);
+                }
+                if(TILES.getProps(GetFG(Math.floor((this.x + dx)/SCALE), Math.floor((this.y+SCALE-1)/SCALE))).dissapearOnTouch){
+                    CURRENT_LEVEL_JSON.setFG(CURRENT_SCREEN, Math.floor((this.x + dx)/SCALE), Math.floor((this.y+SCALE-1)/SCALE), undefined);
+                }
+
                 if(TILES.getProps(GetTile(Math.floor((this.x + dx)/SCALE), Math.floor(this.y/SCALE))).solidRight ||
                 TILES.getProps(GetFG(Math.floor((this.x + dx)/SCALE), Math.floor(this.y/SCALE))).solidRight){
                     this.x = Math.floor((this.x)/SCALE)*SCALE
@@ -356,6 +392,20 @@ const g = p => {
                 }
                 this.isLeft = true;
             } else if (this.velX > 0){ // RIGHT
+                if(TILES.getProps(GetTile(Math.floor((this.x + dx + SCALE - 1)/SCALE), Math.floor(this.y/SCALE))).dissapearOnTouch){
+                    CURRENT_LEVEL_JSON.setTile(CURRENT_SCREEN, Math.floor((this.x + dx + SCALE - 1)/SCALE), Math.floor(this.y/SCALE), undefined);
+                }
+                if(TILES.getProps(GetFG(Math.floor((this.x + dx + SCALE - 1)/SCALE), Math.floor(this.y/SCALE))).dissapearOnTouch){
+                    CURRENT_LEVEL_JSON.setFG(CURRENT_SCREEN, Math.floor((this.x + dx + SCALE - 1)/SCALE), Math.floor(this.y/SCALE), undefined);
+                }
+                if(TILES.getProps(GetTile(Math.floor((this.x + dx + SCALE - 1)/SCALE), Math.floor((this.y+SCALE-1)/SCALE))).dissapearOnTouch){
+                    CURRENT_LEVEL_JSON.setTile(CURRENT_SCREEN, Math.floor((this.x + dx + SCALE - 1)/SCALE), Math.floor((this.y+SCALE-1)/SCALE), undefined);
+                }
+                if(TILES.getProps(GetFG(Math.floor((this.x + dx + SCALE - 1)/SCALE), Math.floor((this.y+SCALE-1)/SCALE))).dissapearOnTouch){
+                    CURRENT_LEVEL_JSON.setFG(CURRENT_SCREEN, Math.floor((this.x + dx + SCALE - 1)/SCALE), Math.floor((this.y+SCALE-1)/SCALE), undefined);
+                }
+
+
                 if(TILES.getProps(GetTile(Math.floor((this.x + dx + SCALE - 1)/SCALE), Math.floor(this.y/SCALE))).solidLeft ||
                 TILES.getProps(GetFG(Math.floor((this.x + dx + SCALE - 1)/SCALE), Math.floor(this.y/SCALE))).solidLeft){
                     this.x = Math.floor((this.x + SCALE - 1)/SCALE)*SCALE
@@ -374,6 +424,19 @@ const g = p => {
             this.x += dx;
 
             if(this.velY < 0){ // UP
+                if(TILES.getProps(GetTile(Math.floor((this.x)/SCALE), Math.floor((this.y+dy)/SCALE))).dissapearOnTouch){
+                    CURRENT_LEVEL_JSON.setTile(CURRENT_SCREEN, Math.floor((this.x)/SCALE), Math.floor((this.y+dy)/SCALE), undefined);
+                }
+                if(TILES.getProps(GetFG(Math.floor((this.x)/SCALE), Math.floor((this.y+dy)/SCALE))).dissapearOnTouch){
+                    CURRENT_LEVEL_JSON.setFG(CURRENT_SCREEN, Math.floor((this.x)/SCALE), Math.floor((this.y+dy)/SCALE), undefined);
+                }
+                if(TILES.getProps(GetTile(Math.floor((this.x+SCALE-1)/SCALE), Math.floor((this.y+dy)/SCALE))).dissapearOnTouch){
+                    CURRENT_LEVEL_JSON.setTile(CURRENT_SCREEN, Math.floor((this.x+SCALE-1)/SCALE), Math.floor((this.y+dy)/SCALE), undefined);
+                }
+                if(TILES.getProps(GetFG(Math.floor((this.x+SCALE-1)/SCALE), Math.floor((this.y+dy)/SCALE))).dissapearOnTouch){
+                    CURRENT_LEVEL_JSON.setFG(CURRENT_SCREEN, Math.floor((this.x+SCALE-1)/SCALE), Math.floor((this.y+dy)/SCALE), undefined);
+                }
+
                 if(TILES.getProps(GetTile(Math.floor((this.x)/SCALE), Math.floor((this.y+dy)/SCALE))).solidBottom ||
                 TILES.getProps(GetFG(Math.floor((this.x)/SCALE), Math.floor((this.y+dy)/SCALE))).solidBottom){
                     this.y = Math.floor((this.y)/SCALE)*SCALE;
@@ -390,6 +453,18 @@ const g = p => {
                 let t1f = TILES.getProps(GetFG(Math.floor((this.x)/SCALE), Math.ceil((this.y+dy)/SCALE)));
                 let t2m = TILES.getProps(GetTile(Math.floor((this.x+SCALE-1)/SCALE), Math.ceil((this.y+dy)/SCALE)));
                 let t2f = TILES.getProps(GetFG(Math.floor((this.x+SCALE-1)/SCALE), Math.ceil((this.y+dy)/SCALE)));
+                if(t1m.dissapearOnTouch){
+                    CURRENT_LEVEL_JSON.setTile(CURRENT_SCREEN, Math.floor((this.x)/SCALE), Math.ceil((this.y+dy)/SCALE), undefined);
+                }
+                if(t1f.dissapearOnTouch){
+                    CURRENT_LEVEL_JSON.setFG(CURRENT_SCREEN, Math.floor((this.x)/SCALE), Math.ceil((this.y+dy)/SCALE), undefined);
+                }
+                if(t2m.dissapearOnTouch){
+                    CURRENT_LEVEL_JSON.setTile(CURRENT_SCREEN, Math.floor((this.x+SCALE-1)/SCALE), Math.ceil((this.y+dy)/SCALE), undefined);
+                }
+                if(t2f.dissapearOnTouch){
+                    CURRENT_LEVEL_JSON.setFG(CURRENT_SCREEN, Math.floor((this.x+SCALE-1)/SCALE), Math.ceil((this.y+dy)/SCALE), undefined);
+                }
                 if(
                     (t1m.solidTop && !(t1m.isSemisolid && !t1m.solidBottom && this.downIsPressed)) ||
                     (t1f.solidTop && !(t1m.isSemisolid && !t1m.solidBottom && this.downIsPressed))
@@ -538,17 +613,11 @@ const g = p => {
                 p.image(tileset, i*SCALE, j*SCALE, SCALE, SCALE, iX*SCALE, iY*SCALE, SCALE, SCALE);
             }
         }
-        if(DEBUG_MODE){
-            p.stroke(0);
-            p.noFill();
-            // p.line(0, SCREEN_HEIGHT-180, SCREEN_WIDTH, SCREEN_HEIGHT-180);
-            p.rect(0, SCREEN_HEIGHT-180, SCREEN_WIDTH/4, 180);
-            p.rect(SCREEN_WIDTH/4, SCREEN_HEIGHT-180, SCREEN_WIDTH/4, 180);
-            p.rect(SCREEN_WIDTH/4*2, SCREEN_HEIGHT-180, SCREEN_WIDTH/4, 180);
-            p.rect(SCREEN_WIDTH/4*3, SCREEN_HEIGHT-180, SCREEN_WIDTH/4, 180);
-        }
         if(p.frameCount % 5 == 0){
-            doAnims();
+            doAnims(ANIMATIONS_5);
+        }
+        if(p.frameCount % 20 == 0){
+            doAnims(ANIMATIONS_20);
         }
         if(p.frameCount % 60 == 0){
             onSave();
@@ -577,20 +646,20 @@ const g = p => {
         }
     }
 
-    function doAnims(){
+    function doAnims(anims){
         for(let i = 0; i <= LAST_TILE_X; i++){
             for(let j = 0; j <= LAST_TILE_Y; j++){
                 let curTile = GetTile(i, j);
-                if(ANIMATIONS[curTile] != null){
-                    CURRENT_LEVEL_JSON.setTile(CURRENT_SCREEN, i, j, ANIMATIONS[curTile]);
+                if(anims[curTile] != null){
+                    CURRENT_LEVEL_JSON.setTile(CURRENT_SCREEN, i, j, anims[curTile]);
                 }
                 curTile = GetBG(i, j);
-                if(ANIMATIONS[curTile] != null){
-                    CURRENT_LEVEL_JSON.setBG(CURRENT_SCREEN, i, j, ANIMATIONS[curTile]);
+                if(anims[curTile] != null){
+                    CURRENT_LEVEL_JSON.setBG(CURRENT_SCREEN, i, j, anims[curTile]);
                 }
                 curTile = GetFG(i, j);
-                if(ANIMATIONS[curTile] != null){
-                    CURRENT_LEVEL_JSON.setFG(CURRENT_SCREEN, i, j, ANIMATIONS[curTile]);
+                if(anims[curTile] != null){
+                    CURRENT_LEVEL_JSON.setFG(CURRENT_SCREEN, i, j, anims[curTile]);
                 }
             }
         }
