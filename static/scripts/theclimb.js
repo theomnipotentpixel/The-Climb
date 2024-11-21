@@ -50,6 +50,7 @@ const g = p => {
         isSemisolid: false,
         isSlippery: false,
         dissapearOnTouch: false,
+        isBouncy: false,
     }
     PROPS.bridge = {
         solidTop: true,
@@ -59,6 +60,7 @@ const g = p => {
         isSemisolid: true,
         isSlippery: false,
         dissapearOnTouch: false,
+        isBouncy: false,
     }
     PROPS.empty = {
         solidTop: false,
@@ -68,6 +70,7 @@ const g = p => {
         isSemisolid: false,
         isSlippery: false,
         dissapearOnTouch: false,
+        isBouncy: false,
     }
     PROPS.slippery = {
         solidTop: true,
@@ -77,6 +80,7 @@ const g = p => {
         isSemisolid: false,
         isSlippery: true,
         dissapearOnTouch: false,
+        isBouncy: false,
     }
     PROPS.slipperyBridge = {
         solidTop: true,
@@ -86,6 +90,7 @@ const g = p => {
         isSemisolid: true,
         isSlippery: true,
         dissapearOnTouch: false,
+        isBouncy: false,
     }
 
     PROPS.coin = {
@@ -96,6 +101,19 @@ const g = p => {
         isSemisolid: false,
         isSlippery: false,
         dissapearOnTouch: true,
+        isBouncy: false,
+    }
+
+    PROPS.spring = {
+        solidTop: true,
+        solidBottom: false,
+        solidLeft: false,
+        solidRight: false,
+        isSemisolid: false,
+        isSlippery: false,
+        dissapearOnTouch: false,
+        isBouncy: true,
+        bounceFactor: 625*1.5
     }
 
     let ANIMATIONS_5 = {
@@ -153,6 +171,9 @@ const g = p => {
 
         if(id == 160 || id == 161)
             return PROPS.coin;
+
+        if(id == 226)
+            return PROPS.spring;
 
         return PROPS.empty;
     }
@@ -495,6 +516,11 @@ const g = p => {
                     dy = 0;
                     this.isOnGround = true;
                     this.velY = 0;
+                    if(t1m.isBouncy){
+                        this.velY = -t1m.bounceFactor;
+                    } else if(t1f.isBouncy){
+                        this.velY = -t1f.bounceFactor;
+                    }
                 } else if(
                     (t2m.solidTop && !(t2m.isSemisolid && !t2m.solidBottom && this.downIsPressed)) ||
                     (t2f.solidTop && !(t2m.isSemisolid && !t2m.solidBottom && this.downIsPressed))
@@ -504,6 +530,11 @@ const g = p => {
                     dy = 0;
                     this.isOnGround = true;
                     this.velY = 0;
+                    if(t2m.isBouncy){
+                        this.velY = -t2m.bounceFactor;
+                    } else if(t2f.isBouncy){
+                        this.velY = -t2f.bounceFactor;
+                    }
                 }
             }
             
@@ -572,12 +603,12 @@ const g = p => {
         }
     }
 
-    let player;
-
     let currentStage = {
     };
 
     let currentScreen = "play";
+
+    let player;
 
     let backgroundSprite;
     p.preload = function(){

@@ -55,6 +55,28 @@ function chooseBlock(blockX, blockY){
     console.log(currentBlock);
 }
 
+function keyPressed(){
+    let cs = currentScreen.split(",");
+    cs = [parseInt(cs[0]), parseInt(cs[1])]
+    if(keyCode == LEFT_ARROW){
+        if(level[(cs[0]-1)+","+(cs[1])])
+            cs[0] -= 1;
+    }
+    if(keyCode == RIGHT_ARROW){
+        if(level[(cs[0]+1)+","+(cs[1])])
+            cs[0] += 1;
+    }
+    if(keyCode == UP_ARROW){
+        if(level[(cs[0])+","+(cs[1]-1)])
+            cs[1] -= 1;
+    }
+    if(keyCode == DOWN_ARROW){
+        if(level[(cs[0])+","+(cs[1]+1)])
+            cs[1] += 1;
+    }
+    currentScreen = cs[0]+","+cs[1]
+}
+
 function mousePressed(){
     let blockX = Math.floor(mouseX / SCALE);
     let blockY = Math.floor(mouseY / SCALE);
