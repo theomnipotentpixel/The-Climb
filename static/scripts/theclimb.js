@@ -161,7 +161,7 @@ const g = p => {
 
         if(id >= 68 && id <= 71)
             return PROPS.fullSolid;
-        if(id >= 78 && id <= 79)
+        if(id >= 76 && id <= 79)
             return PROPS.fullSolid;
         if(id >= 84 && id <= 87)
             return PROPS.fullSolid;
