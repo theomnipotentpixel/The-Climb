@@ -14,6 +14,10 @@ const g = p => {
         up: false,
         down: false
     }
+    let SOUND_PATHS = {
+        coin: "coin.wav"
+    }
+    let SOUNDS = {};
     if(CONFIG == null){
         CONFIG = JSON.parse(JSON.stringify(DEFAULT_CONFIG))
     } else
@@ -365,18 +369,23 @@ const g = p => {
             let dx = this.velX * deltaTime;
             let dy = this.velY * deltaTime;
 
+            let playCoin = false;
             if(this.velX < 0){ // LEFT
                 if(TILES.getProps(GetTile(Math.floor((this.x + dx)/SCALE), Math.floor(this.y/SCALE))).dissapearOnTouch){
                     CURRENT_LEVEL_JSON.setTile(CURRENT_SCREEN, Math.floor((this.x + dx)/SCALE), Math.floor(this.y/SCALE), undefined);
+                    playCoin = true;
                 }
                 if(TILES.getProps(GetFG(Math.floor((this.x + dx)/SCALE), Math.floor(this.y/SCALE))).dissapearOnTouch){
                     CURRENT_LEVEL_JSON.setFG(CURRENT_SCREEN, Math.floor((this.x + dx)/SCALE), Math.floor(this.y/SCALE), undefined);
+                    playCoin = true;
                 }
                 if(TILES.getProps(GetTile(Math.floor((this.x + dx)/SCALE), Math.floor((this.y+SCALE-1)/SCALE))).dissapearOnTouch){
                     CURRENT_LEVEL_JSON.setTile(CURRENT_SCREEN, Math.floor((this.x + dx)/SCALE), Math.floor((this.y+SCALE-1)/SCALE), undefined);
+                    playCoin = true;
                 }
                 if(TILES.getProps(GetFG(Math.floor((this.x + dx)/SCALE), Math.floor((this.y+SCALE-1)/SCALE))).dissapearOnTouch){
                     CURRENT_LEVEL_JSON.setFG(CURRENT_SCREEN, Math.floor((this.x + dx)/SCALE), Math.floor((this.y+SCALE-1)/SCALE), undefined);
+                    playCoin = true;
                 }
 
                 if(TILES.getProps(GetTile(Math.floor((this.x + dx)/SCALE), Math.floor(this.y/SCALE))).solidRight ||
@@ -394,15 +403,19 @@ const g = p => {
             } else if (this.velX > 0){ // RIGHT
                 if(TILES.getProps(GetTile(Math.floor((this.x + dx + SCALE - 1)/SCALE), Math.floor(this.y/SCALE))).dissapearOnTouch){
                     CURRENT_LEVEL_JSON.setTile(CURRENT_SCREEN, Math.floor((this.x + dx + SCALE - 1)/SCALE), Math.floor(this.y/SCALE), undefined);
+                    playCoin = true;
                 }
                 if(TILES.getProps(GetFG(Math.floor((this.x + dx + SCALE - 1)/SCALE), Math.floor(this.y/SCALE))).dissapearOnTouch){
                     CURRENT_LEVEL_JSON.setFG(CURRENT_SCREEN, Math.floor((this.x + dx + SCALE - 1)/SCALE), Math.floor(this.y/SCALE), undefined);
+                    playCoin = true;
                 }
                 if(TILES.getProps(GetTile(Math.floor((this.x + dx + SCALE - 1)/SCALE), Math.floor((this.y+SCALE-1)/SCALE))).dissapearOnTouch){
                     CURRENT_LEVEL_JSON.setTile(CURRENT_SCREEN, Math.floor((this.x + dx + SCALE - 1)/SCALE), Math.floor((this.y+SCALE-1)/SCALE), undefined);
+                    playCoin = true;
                 }
                 if(TILES.getProps(GetFG(Math.floor((this.x + dx + SCALE - 1)/SCALE), Math.floor((this.y+SCALE-1)/SCALE))).dissapearOnTouch){
                     CURRENT_LEVEL_JSON.setFG(CURRENT_SCREEN, Math.floor((this.x + dx + SCALE - 1)/SCALE), Math.floor((this.y+SCALE-1)/SCALE), undefined);
+                    playCoin = true;
                 }
 
 
@@ -426,15 +439,19 @@ const g = p => {
             if(this.velY < 0){ // UP
                 if(TILES.getProps(GetTile(Math.floor((this.x)/SCALE), Math.floor((this.y+dy)/SCALE))).dissapearOnTouch){
                     CURRENT_LEVEL_JSON.setTile(CURRENT_SCREEN, Math.floor((this.x)/SCALE), Math.floor((this.y+dy)/SCALE), undefined);
+                    playCoin = true;
                 }
                 if(TILES.getProps(GetFG(Math.floor((this.x)/SCALE), Math.floor((this.y+dy)/SCALE))).dissapearOnTouch){
                     CURRENT_LEVEL_JSON.setFG(CURRENT_SCREEN, Math.floor((this.x)/SCALE), Math.floor((this.y+dy)/SCALE), undefined);
+                    playCoin = true;
                 }
                 if(TILES.getProps(GetTile(Math.floor((this.x+SCALE-1)/SCALE), Math.floor((this.y+dy)/SCALE))).dissapearOnTouch){
                     CURRENT_LEVEL_JSON.setTile(CURRENT_SCREEN, Math.floor((this.x+SCALE-1)/SCALE), Math.floor((this.y+dy)/SCALE), undefined);
+                    playCoin = true;
                 }
                 if(TILES.getProps(GetFG(Math.floor((this.x+SCALE-1)/SCALE), Math.floor((this.y+dy)/SCALE))).dissapearOnTouch){
                     CURRENT_LEVEL_JSON.setFG(CURRENT_SCREEN, Math.floor((this.x+SCALE-1)/SCALE), Math.floor((this.y+dy)/SCALE), undefined);
+                    playCoin = true;
                 }
 
                 if(TILES.getProps(GetTile(Math.floor((this.x)/SCALE), Math.floor((this.y+dy)/SCALE))).solidBottom ||
@@ -455,15 +472,19 @@ const g = p => {
                 let t2f = TILES.getProps(GetFG(Math.floor((this.x+SCALE-1)/SCALE), Math.ceil((this.y+dy)/SCALE)));
                 if(t1m.dissapearOnTouch){
                     CURRENT_LEVEL_JSON.setTile(CURRENT_SCREEN, Math.floor((this.x)/SCALE), Math.ceil((this.y+dy)/SCALE), undefined);
+                    playCoin = true;
                 }
                 if(t1f.dissapearOnTouch){
                     CURRENT_LEVEL_JSON.setFG(CURRENT_SCREEN, Math.floor((this.x)/SCALE), Math.ceil((this.y+dy)/SCALE), undefined);
+                    playCoin = true;
                 }
                 if(t2m.dissapearOnTouch){
                     CURRENT_LEVEL_JSON.setTile(CURRENT_SCREEN, Math.floor((this.x+SCALE-1)/SCALE), Math.ceil((this.y+dy)/SCALE), undefined);
+                    playCoin = true;
                 }
                 if(t2f.dissapearOnTouch){
                     CURRENT_LEVEL_JSON.setFG(CURRENT_SCREEN, Math.floor((this.x+SCALE-1)/SCALE), Math.ceil((this.y+dy)/SCALE), undefined);
+                    playCoin = true;
                 }
                 if(
                     (t1m.solidTop && !(t1m.isSemisolid && !t1m.solidBottom && this.downIsPressed)) ||
@@ -487,6 +508,10 @@ const g = p => {
             }
             
             this.y += dy;
+
+            if(playCoin){
+                SOUNDS.coin.play();
+            }
 
         }
 
@@ -555,6 +580,11 @@ const g = p => {
     let currentScreen = "play";
 
     let backgroundSprite;
+    p.preload = function(){
+        for(let [k, v] of Object.entries(SOUND_PATHS)){
+            SOUNDS[k] = p.loadSound("/sounds/" + v);
+        }
+    }
     p.setup = function(){
         loadLevelPack();
         p.createCanvas(SCREEN_WIDTH, SCREEN_HEIGHT);
