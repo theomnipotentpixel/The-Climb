@@ -1,5 +1,5 @@
 const g = p => {
-    let CONFIG = localStorage.getItem("config");
+    let CONFIG;
     let DEFAULT_CONFIG = {
         KEYS: {
             MOVE_LEFT: [p.LEFT_ARROW, 65],
@@ -21,14 +21,6 @@ const g = p => {
         jump: "jump.wav"
     }
     let SOUNDS = {};
-    if(CONFIG == null){
-        CONFIG = JSON.parse(JSON.stringify(DEFAULT_CONFIG))
-    } else
-        try{
-            CONFIG = JSON.parse(CONFIG);
-        } catch {
-            CONFIG = JSON.parse(JSON.stringify(DEFAULT_CONFIG))
-        }
 
     let IS_PRESSED = key => p.keyIsDown(key);
 
@@ -760,6 +752,7 @@ const g = p => {
         p.noStroke();
         p.frameRate(120);
         onLoad();
+        alert("Arrow keys to move. Get to the top!")
     }
 
     p.draw = function(){
@@ -861,11 +854,21 @@ const g = p => {
     }
 
     function onLoad(){
+        CONFIG = localStorage.getItem("config");
         
+        if(CONFIG == null){
+            CONFIG = JSON.parse(JSON.stringify(DEFAULT_CONFIG))
+        } else
+            try{
+                CONFIG = JSON.parse(CONFIG);
+            } catch {
+                CONFIG = JSON.parse(JSON.stringify(DEFAULT_CONFIG))
+            }
     }
 
     function onSave(){
         localStorage.setItem("config", JSON.stringify(CONFIG));
+        localStorage.setItem("");
     }
 }
 
