@@ -1,3 +1,5 @@
+
+let CURRENT_SCREEN = [0,0];
 const g = p => {
     let CONFIG;
     let DEFAULT_CONFIG = {
@@ -29,10 +31,10 @@ const g = p => {
     const LAST_TILE_X = SCREEN_WIDTH / SCALE - 1;
     const LAST_TILE_Y = SCREEN_HEIGHT / SCALE - 1;
     let DEBUG_MODE = false;
+    let IS_PAUSED = false;
 
     let LEVELS_LOADED = false;
     let CURRENT_LEVEL_JSON = null;
-    let CURRENT_SCREEN = [0,0];
     let tileset;
     let TILES = {};
 
@@ -764,12 +766,17 @@ const g = p => {
         }
     }
 
+    function screen_paused(){
+        
+    }
+
     function screen_playGame(){
         p.noStroke()
         p.background(0x11, 0x1d, 0x35);
         p.image(backgroundSprite, 0, 0, 720, 720, 0, 960-360+CURRENT_SCREEN[1]*40, 360, 360);
         handleTouches();
-        player.update(p.deltaTime/1000);
+        if(!IS_PAUSED)
+            player.update(p.deltaTime/1000);
         for(let i = 0; i <= LAST_TILE_X; i++){
             for(let j = 0; j <= LAST_TILE_Y; j++){
                 let curTile = GetBG(i, j);
@@ -801,14 +808,19 @@ const g = p => {
                 p.image(tileset, i*SCALE, j*SCALE, SCALE, SCALE, iX*SCALE, iY*SCALE, SCALE, SCALE);
             }
         }
-        if(p.frameCount % 5 == 0){
-            doAnims(ANIMATIONS_5);
+        if(!IS_PAUSED){
+            if(p.frameCount % 5 == 0){
+                doAnims(ANIMATIONS_5);
+            }
+            if(p.frameCount % 20 == 0){
+                doAnims(ANIMATIONS_20);
+            }
+            if(p.frameCount % 60 == 0){
+                onSave();
+            }
         }
-        if(p.frameCount % 20 == 0){
-            doAnims(ANIMATIONS_20);
-        }
-        if(p.frameCount % 60 == 0){
-            onSave();
+        if(IS_PAUSED){
+            screen_paused();
         }
     }
 
@@ -831,6 +843,12 @@ const g = p => {
                     TOUCHES.up = true;
                 }
             }
+        }
+    }
+
+    p.keyPressed = function(){
+        if(p.keyCode == p.ESCAPE){
+            IS_PAUSED = !IS_PAUSED;
         }
     }
 
@@ -868,7 +886,6 @@ const g = p => {
 
     function onSave(){
         localStorage.setItem("config", JSON.stringify(CONFIG));
-        localStorage.setItem("");
     }
 }
 
