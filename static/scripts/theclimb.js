@@ -126,7 +126,10 @@ const g = p => {
         changeOnTouch: true,
         changeTo: 159,
         isBouncy: false,
-        sound: "sunglasses"
+        sound: "sunglasses",
+        onHit: function(){
+            player.hasSunglasses = true;
+        }
     }
 
     let ANIMATIONS_5 = {
@@ -361,6 +364,7 @@ const g = p => {
         this.gravity = 1500;
         this.isOnGround = false;
         this.isLeft = false;
+        this.hasSunglasses = false;
         this.sprites = p.loadImage("sprites/player.png");
 
         this.update = function(deltaTime){
@@ -414,6 +418,8 @@ const g = p => {
                 if(TILES.getProps(GetTile(x1, y1)).changeOnTouch){
                     if(TILES.getProps(GetTile(x1, y1)).sound)
                         SOUNDS[TILES.getProps(GetTile(x1, y1)).sound].play();
+                    if(TILES.getProps(GetTile(x1, y1)).onHit)
+                        TILES.getProps(GetTile(x1, y1)).onHit();
                     CURRENT_LEVEL_JSON.setTile(
                         CURRENT_SCREEN, x1, y1,
                         TILES.getProps(GetTile(x1, y1)).changeTo
@@ -424,6 +430,8 @@ const g = p => {
                 if(TILES.getProps(GetFG(x1, y1)).changeOnTouch){
                     if(TILES.getProps(GetFG(x1, y1)).sound)
                         SOUNDS[TILES.getProps(GetTile(x1, y1)).sound].play();
+                    if(TILES.getProps(GetFG(x1, y1)).onHit)
+                        TILES.getProps(GetFG(x1, y1)).onHit();
                     CURRENT_LEVEL_JSON.setFG(
                         CURRENT_SCREEN, x1, y1,
                         TILES.getProps(GetFG(x1, y1)).changeTo
@@ -434,6 +442,8 @@ const g = p => {
                 if(TILES.getProps(GetTile(x2, y2)).changeOnTouch){
                     if(TILES.getProps(GetTile(x2, y2)).sound)
                         SOUNDS[TILES.getProps(GetTile(x2, y2)).sound].play();
+                    if(TILES.getProps(GetTile(x2, y2)).onHit)
+                        TILES.getProps(GetTile(x2, y2)).onHit();
                     CURRENT_LEVEL_JSON.setTile( 
                         CURRENT_SCREEN, x2, y2,
                         TILES.getProps(GetTile(x2, y2)).changeTo
@@ -444,6 +454,8 @@ const g = p => {
                 if(TILES.getProps(GetFG(x2, y2)).changeOnTouch){
                     if(TILES.getProps(GetFG(x2, y2)).sound)
                         SOUNDS[TILES.getProps(GetTile(x2, y2)).sound].play();
+                    if(TILES.getProps(GetFG(x2, y2)).onHit)
+                        TILES.getProps(GetFG(x2, y2)).onHit();
                     CURRENT_LEVEL_JSON.setFG( 
                         CURRENT_SCREEN, x2, y2,
                         TILES.getProps(GetFG(x2, y2)).changeTo
@@ -470,6 +482,8 @@ const g = p => {
                 if(TILES.getProps(GetTile(x1, y1)).changeOnTouch){
                     if(TILES.getProps(GetTile(x1, y1)).sound)
                         SOUNDS[TILES.getProps(GetTile(x1, y1)).sound].play();
+                    if(TILES.getProps(GetTile(x1, y1)).onHit)
+                        TILES.getProps(GetTile(x1, y1)).onHit();
                     CURRENT_LEVEL_JSON.setTile(
                         CURRENT_SCREEN, x1, y1,
                         TILES.getProps(GetTile(x1, y1)).changeTo
@@ -480,6 +494,8 @@ const g = p => {
                 if(TILES.getProps(GetFG(x1, y1)).changeOnTouch){
                     if(TILES.getProps(GetFG(x1, y1)).sound)
                         SOUNDS[TILES.getProps(GetTile(x1, y1)).sound].play();
+                    if(TILES.getProps(GetFG(x1, y1)).onHit)
+                        TILES.getProps(GetFG(x1, y1)).onHit();
                     CURRENT_LEVEL_JSON.setFG(
                         CURRENT_SCREEN, x1, y1,
                         TILES.getProps(GetFG(x1, y1)).changeTo
@@ -490,6 +506,8 @@ const g = p => {
                 if(TILES.getProps(GetTile(x2, y2)).changeOnTouch){
                     if(TILES.getProps(GetTile(x2, y2)).sound)
                         SOUNDS[TILES.getProps(GetTile(x2, y2)).sound].play();
+                    if(TILES.getProps(GetTile(x2, y2)).onHit)
+                        TILES.getProps(GetTile(x2, y2)).onHit();
                     CURRENT_LEVEL_JSON.setTile( 
                         CURRENT_SCREEN, x2, y2,
                         TILES.getProps(GetTile(x2, y2)).changeTo
@@ -500,6 +518,8 @@ const g = p => {
                 if(TILES.getProps(GetFG(x2, y2)).changeOnTouch){
                     if(TILES.getProps(GetFG(x2, y2)).sound)
                         SOUNDS[TILES.getProps(GetTile(x2, y2)).sound].play();
+                    if(TILES.getProps(GetFG(x2, y2)).onHit)
+                        TILES.getProps(GetFG(x2, y2)).onHit();
                     CURRENT_LEVEL_JSON.setFG( 
                         CURRENT_SCREEN, x2, y2,
                         TILES.getProps(GetFG(x2, y2)).changeTo
@@ -532,6 +552,8 @@ const g = p => {
                 if(TILES.getProps(GetTile(x1, y1)).changeOnTouch){
                     if(TILES.getProps(GetTile(x1, y1)).sound)
                         SOUNDS[TILES.getProps(GetTile(x1, y1)).sound].play();
+                    if(TILES.getProps(GetTile(x1, y1)).onHit)
+                        TILES.getProps(GetTile(x1, y1)).onHit();
                     CURRENT_LEVEL_JSON.setTile(
                         CURRENT_SCREEN, x1, y1,
                         TILES.getProps(GetTile(x1, y1)).changeTo
@@ -542,6 +564,8 @@ const g = p => {
                 if(TILES.getProps(GetFG(x1, y1)).changeOnTouch){
                     if(TILES.getProps(GetFG(x1, y1)).sound)
                         SOUNDS[TILES.getProps(GetTile(x1, y1)).sound].play();
+                    if(TILES.getProps(GetFG(x1, y1)).onHit)
+                        TILES.getProps(GetFG(x1, y1)).onHit();
                     CURRENT_LEVEL_JSON.setFG(
                         CURRENT_SCREEN, x1, y1,
                         TILES.getProps(GetFG(x1, y1)).changeTo
@@ -552,6 +576,8 @@ const g = p => {
                 if(TILES.getProps(GetTile(x2, y2)).changeOnTouch){
                     if(TILES.getProps(GetTile(x2, y2)).sound)
                         SOUNDS[TILES.getProps(GetTile(x2, y2)).sound].play();
+                    if(TILES.getProps(GetTile(x2, y2)).onHit)
+                        TILES.getProps(GetTile(x2, y2)).onHit();
                     CURRENT_LEVEL_JSON.setTile( 
                         CURRENT_SCREEN, x2, y2,
                         TILES.getProps(GetTile(x2, y2)).changeTo
@@ -562,6 +588,8 @@ const g = p => {
                 if(TILES.getProps(GetFG(x2, y2)).changeOnTouch){
                     if(TILES.getProps(GetFG(x2, y2)).sound)
                         SOUNDS[TILES.getProps(GetTile(x2, y2)).sound].play();
+                    if(TILES.getProps(GetFG(x2, y2)).onHit)
+                        TILES.getProps(GetFG(x2, y2)).onHit();
                     CURRENT_LEVEL_JSON.setFG( 
                         CURRENT_SCREEN, x2, y2,
                         TILES.getProps(GetFG(x2, y2)).changeTo
@@ -592,6 +620,8 @@ const g = p => {
                 if(TILES.getProps(GetTile(x1, y1)).changeOnTouch){
                     if(TILES.getProps(GetTile(x1, y1)).sound)
                         SOUNDS[TILES.getProps(GetTile(x1, y1)).sound].play();
+                    if(TILES.getProps(GetTile(x1, y1)).onHit)
+                        TILES.getProps(GetTile(x1, y1)).onHit();
                     CURRENT_LEVEL_JSON.setTile(
                         CURRENT_SCREEN, x1, y1,
                         TILES.getProps(GetTile(x1, y1)).changeTo
@@ -602,6 +632,8 @@ const g = p => {
                 if(TILES.getProps(GetFG(x1, y1)).changeOnTouch){
                     if(TILES.getProps(GetFG(x1, y1)).sound)
                         SOUNDS[TILES.getProps(GetTile(x1, y1)).sound].play();
+                    if(TILES.getProps(GetFG(x1, y1)).onHit)
+                        TILES.getProps(GetFG(x1, y1)).onHit();
                     CURRENT_LEVEL_JSON.setFG(
                         CURRENT_SCREEN, x1, y1,
                         TILES.getProps(GetFG(x1, y1)).changeTo
@@ -612,6 +644,8 @@ const g = p => {
                 if(TILES.getProps(GetTile(x2, y2)).changeOnTouch){
                     if(TILES.getProps(GetTile(x2, y2)).sound)
                         SOUNDS[TILES.getProps(GetTile(x2, y2)).sound].play();
+                    if(TILES.getProps(GetTile(x2, y2)).onHit)
+                        TILES.getProps(GetTile(x2, y2)).onHit();
                     CURRENT_LEVEL_JSON.setTile( 
                         CURRENT_SCREEN, x2, y2,
                         TILES.getProps(GetTile(x2, y2)).changeTo
@@ -622,6 +656,8 @@ const g = p => {
                 if(TILES.getProps(GetFG(x2, y2)).changeOnTouch){
                     if(TILES.getProps(GetFG(x2, y2)).sound)
                         SOUNDS[TILES.getProps(GetTile(x2, y2)).sound].play();
+                    if(TILES.getProps(GetFG(x2, y2)).onHit)
+                        TILES.getProps(GetFG(x2, y2)).onHit();
                     CURRENT_LEVEL_JSON.setFG( 
                         CURRENT_SCREEN, x2, y2,
                         TILES.getProps(GetFG(x2, y2)).changeTo
@@ -710,11 +746,18 @@ const g = p => {
         }   
 
         this.draw = function(){
-            p.noStroke();
+            let sgOffset = this.hasSunglasses ? 2 : 0;
+            let actionOffset = 0;
+            if(Math.abs(this.velX) > 0)
+                actionOffset = p.frameCount % 30 < 15;
+            if(this.velY > 0)
+                actionOffset = 2;
+            else if(this.velY < 0)
+                actionOffset = 3;
             if(this.isLeft){
-                p.image(this.sprites, this.x, this.y, SCALE, SCALE, 0*SCALE, 0*SCALE, SCALE, SCALE);
+                p.image(this.sprites, this.x, this.y, SCALE, SCALE, actionOffset*SCALE, sgOffset*SCALE, SCALE, SCALE);
             } else {
-                p.image(this.sprites, this.x, this.y, SCALE, SCALE, 0*SCALE, 1*SCALE, SCALE, SCALE);
+                p.image(this.sprites, this.x, this.y, SCALE, SCALE, actionOffset*SCALE, (sgOffset+1)*SCALE, SCALE, SCALE);
             }
         }
         
@@ -771,7 +814,7 @@ const g = p => {
     }
 
     function screen_playGame(){
-        p.noStroke()
+        p.noStroke();
         p.background(0x11, 0x1d, 0x35);
         p.image(backgroundSprite, 0, 0, 720, 720, 0, 960-360+CURRENT_SCREEN[1]*40, 360, 360);
         handleTouches();
@@ -882,10 +925,39 @@ const g = p => {
             } catch {
                 CONFIG = JSON.parse(JSON.stringify(DEFAULT_CONFIG))
             }
+
+            
+        let playerData = localStorage.getItem("pd");
+        
+        if(playerData == null){
+            
+        } else
+            try{
+                playerData = JSON.parse(playerData);
+                player.loadData(playerData);
+            } catch {
+
+            }
+
+            
+        let cs = localStorage.getItem("cs");
+        
+        if(cs == null){
+            
+        } else
+            try{
+                cs = JSON.parse(cs);
+                CURRENT_SCREEN = cs;
+            } catch {
+
+            }
     }
 
     function onSave(){
         localStorage.setItem("config", JSON.stringify(CONFIG));
+        localStorage.setItem("pd", JSON.stringify(player.saveData()));
+        localStorage.setItem("cs", JSON.stringify(CURRENT_SCREEN));
+
     }
 }
 
