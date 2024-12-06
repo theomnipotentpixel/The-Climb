@@ -893,6 +893,10 @@ const g = p => {
         if(p.keyCode == p.ESCAPE){
             IS_PAUSED = !IS_PAUSED;
         }
+        if(p.keyCode == 82){
+            CURRENT_SCREEN = [0, 0];
+            player = new Player(24, 620, "#ff0000");
+        }
     }
 
     function doAnims(anims){
