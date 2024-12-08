@@ -806,7 +806,14 @@ const g = p => {
             case "play":
                 screen_playGame();
                 break;
+            case "level_select":
+                screen_levelSelect();
+                break;
         }
+    }
+
+    function screen_levelSelect(){
+        
     }
 
     function screen_paused(){
@@ -922,12 +929,12 @@ const g = p => {
         CONFIG = localStorage.getItem("config");
         
         if(CONFIG == null){
-            CONFIG = JSON.parse(JSON.stringify(DEFAULT_CONFIG))
+            CONFIG = JSON.parse(JSON.stringify(DEFAULT_CONFIG));
         } else
             try{
                 CONFIG = JSON.parse(CONFIG);
             } catch {
-                CONFIG = JSON.parse(JSON.stringify(DEFAULT_CONFIG))
+                CONFIG = JSON.parse(JSON.stringify(DEFAULT_CONFIG));
             }
 
             
