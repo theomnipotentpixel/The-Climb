@@ -48,6 +48,7 @@ const g = p => {
     let DEBUG_MODE = false;
     let IS_PAUSED = false;
     let IS_MINIMAP_SHOWING = false;
+    let minimap = null;
 
     let LEVELS_LOADED = false;
     let CURRENT_LEVEL_JSON = null;
@@ -381,7 +382,6 @@ const g = p => {
         this.isOnGround = false;
         this.isLeft = false;
         this.hasSunglasses = false;
-        this.sprites = SPRITES.player;
 
         this.update = function(deltaTime){
             if(deltaTime > 0.1)
@@ -771,9 +771,9 @@ const g = p => {
             else if(this.velY < 0)
                 actionOffset = 3;
             if(this.isLeft){
-                p.image(this.sprites, this.x, this.y, SCALE, SCALE, actionOffset*SCALE, sgOffset*SCALE, SCALE, SCALE);
+                p.image(SPRITES.player, this.x, this.y, SCALE, SCALE, actionOffset*SCALE, sgOffset*SCALE, SCALE, SCALE);
             } else {
-                p.image(this.sprites, this.x, this.y, SCALE, SCALE, actionOffset*SCALE, (sgOffset+1)*SCALE, SCALE, SCALE);
+                p.image(SPRITES.player, this.x, this.y, SCALE, SCALE, actionOffset*SCALE, (sgOffset+1)*SCALE, SCALE, SCALE);
             }
         }
         
@@ -849,7 +849,7 @@ const g = p => {
     function screen_playGame(){
         p.noStroke();
         p.background(0x11, 0x1d, 0x35);
-        p.image(backgroundSprite, 0, 0, 720, 720, 0, 960-360+CURRENT_SCREEN[1]*40, 360, 360);
+        p.image(SPRITES.sky, 0, 0, 720, 720, 0, 960-360+CURRENT_SCREEN[1]*40, 360, 360);
         handleTouches();
         if(!IS_PAUSED)
             player.update(p.deltaTime/1000);
@@ -860,7 +860,7 @@ const g = p => {
                     continue;
                 let iX = curTile % 8;
                 let iY = Math.floor(curTile / 8);
-                p.image(tileset, i*SCALE, j*SCALE, SCALE, SCALE, iX*SCALE, iY*SCALE, SCALE, SCALE);
+                p.image(SPRITES.tileset, i*SCALE, j*SCALE, SCALE, SCALE, iX*SCALE, iY*SCALE, SCALE, SCALE);
             }
         }
         for(let i = 0; i <= LAST_TILE_X; i++){
@@ -870,7 +870,7 @@ const g = p => {
                     continue;
                 let iX = curTile % 8;
                 let iY = Math.floor(curTile / 8);
-                p.image(tileset, i*SCALE, j*SCALE, SCALE, SCALE, iX*SCALE, iY*SCALE, SCALE, SCALE);
+                p.image(SPRITES.tileset, i*SCALE, j*SCALE, SCALE, SCALE, iX*SCALE, iY*SCALE, SCALE, SCALE);
             }
         }
         player.draw();
@@ -881,12 +881,13 @@ const g = p => {
                     continue;
                 let iX = curTile % 8;
                 let iY = Math.floor(curTile / 8);
-                p.image(tileset, i*SCALE, j*SCALE, SCALE, SCALE, iX*SCALE, iY*SCALE, SCALE, SCALE);
+                p.image(SPRITES.tileset, i*SCALE, j*SCALE, SCALE, SCALE, iX*SCALE, iY*SCALE, SCALE, SCALE);
             }
         }
         if(IS_MINIMAP_SHOWING){
             p.imageMode(p.CENTER);
             p.image(SPRITES.minimap_bg, SCREEN_WIDTH/2, SCREEN_HEIGHT/2);
+            p.image(minimap.gfx, SCREEN_WIDTH/2, SCREEN_HEIGHT/2);
             p.imageMode(p.CORNER);
         }
         if(!IS_PAUSED){
@@ -927,7 +928,7 @@ const g = p => {
         }
     }
 
-    p.keyPressed = function(){
+    p.keyPressed = function(event){
         if(p.keyCode == p.ESCAPE){
             IS_PAUSED = !IS_PAUSED;
         } else if(p.keyCode == 82){
@@ -939,10 +940,40 @@ const g = p => {
             let y = parseInt(screenInput.split(",")[1]);
             CURRENT_SCREEN = [x,y];
         } else if(p.keyCode == 9){
+            event.preventDefault();
             IS_MINIMAP_SHOWING = !IS_MINIMAP_SHOWING;
-            generateMinimap(CURRENT_LEVEL_JSON.stages, CURRENT_SCREEN);
-
+            if(IS_MINIMAP_SHOWING)
+                initMinimap();
         }
+    }
+
+    function initMinimap(){
+        minimap = generateMinimap(CURRENT_LEVEL_JSON.stages);
+
+        const minimapScale = 24;
+
+        let gfxWidth = minimap.width * (minimapScale + 2), gfxHeight = minimap.height * (minimapScale + 2);
+
+        let gfx = p.createGraphics(gfxWidth, gfxHeight);
+        gfx.noStroke();
+
+        for(let x = 0; x < minimap.width; x++){
+            for(let y = 0; y < minimap.height; y++){
+                if(minimap.raw[y][x] == 1){
+                    gfx.fill(0, 123);
+                } else {
+                    gfx.fill(0, 0);
+                }
+                if(x == CURRENT_SCREEN[0] && y == -CURRENT_SCREEN[1]){
+                    gfx.fill(0, 255, 0, 123);
+                }
+                let drawX = (x * (minimapScale + 2)) - 2;
+                let drawY = (((minimap.height - y - 1) * (minimapScale + 2)) - 2);
+                gfx.rect(drawX, drawY, minimapScale, minimapScale);
+            }
+        }
+        
+        minimap.gfx = gfx;
     }
 
     function doAnims(anims){
