@@ -1,6 +1,10 @@
+import { generateMinimap } from "./utils.js";
 
-let CURRENT_SCREEN = [0,0];
 const g = p => {
+    const DEV_HOSTNAMES = [
+        "http://localhost:3000"
+    ];
+    const IS_DEVMODE = DEV_HOSTNAMES.includes(location.origin);
     let CONFIG;
     let DEFAULT_CONFIG = {
         KEYS: {
@@ -16,6 +20,16 @@ const g = p => {
         up: false,
         down: false
     }
+    
+    let SPRITE_PATHS = {
+        minimap_bg: "minimap-bg.png",
+        player: "player.png",
+        tileset: "tiles/default-sharp.png",
+        sky: "sky.png"
+    }
+
+    let SPRITES = {};
+
     let SOUND_PATHS = {
         coin: "coin.wav",
         bounce: "bounce.wav",
@@ -25,6 +39,7 @@ const g = p => {
     let SOUNDS = {};
 
     let IS_PRESSED = key => p.keyIsDown(key);
+    let CURRENT_SCREEN = [0,0];
 
     const SCALE = 24;
     const SCREEN_HEIGHT = 720; const SCREEN_WIDTH = 720;
@@ -32,6 +47,7 @@ const g = p => {
     const LAST_TILE_Y = SCREEN_HEIGHT / SCALE - 1;
     let DEBUG_MODE = false;
     let IS_PAUSED = false;
+    let IS_MINIMAP_SHOWING = false;
 
     let LEVELS_LOADED = false;
     let CURRENT_LEVEL_JSON = null;
@@ -365,7 +381,7 @@ const g = p => {
         this.isOnGround = false;
         this.isLeft = false;
         this.hasSunglasses = false;
-        this.sprites = p.loadImage("sprites/player.png");
+        this.sprites = SPRITES.player;
 
         this.update = function(deltaTime){
             if(deltaTime > 0.1)
@@ -782,22 +798,32 @@ const g = p => {
     let player;
 
     let backgroundSprite;
-    p.preload = function(){
+
+    function loadAssets(){
         for(let [k, v] of Object.entries(SOUND_PATHS)){
             SOUNDS[k] = p.loadSound("sounds/" + v);
         }
+        for(let [k, v] of Object.entries(SPRITE_PATHS)){
+            SPRITES[k] = p.loadImage("sprites/" + v);
+        }
     }
+
+    p.preload = function(){
+        loadAssets();
+    }
+
     p.setup = function(){
         loadLevelPack();
         p.createCanvas(SCREEN_WIDTH, SCREEN_HEIGHT);
         player = new Player(24, 620, "#ff0000");
-        tileset = p.loadImage("sprites/tiles/default-sharp.png");
-        backgroundSprite = p.loadImage("sprites/sky.png");
+        tileset = SPRITES.tileset;
+        backgroundSprite = SPRITES.sky;
         p.background(62);
         p.noStroke();
         p.frameRate(120);
         onLoad();
-        alert("Arrow keys to move. Get to the top!")
+        if(!IS_DEVMODE)
+            alert("Arrow keys to move. Get to the top!")
     }
 
     p.draw = function(){
@@ -858,6 +884,11 @@ const g = p => {
                 p.image(tileset, i*SCALE, j*SCALE, SCALE, SCALE, iX*SCALE, iY*SCALE, SCALE, SCALE);
             }
         }
+        if(IS_MINIMAP_SHOWING){
+            p.imageMode(p.CENTER);
+            p.image(SPRITES.minimap_bg, SCREEN_WIDTH/2, SCREEN_HEIGHT/2);
+            p.imageMode(p.CORNER);
+        }
         if(!IS_PAUSED){
             if(p.frameCount % 5 == 0){
                 doAnims(ANIMATIONS_5);
@@ -899,10 +930,18 @@ const g = p => {
     p.keyPressed = function(){
         if(p.keyCode == p.ESCAPE){
             IS_PAUSED = !IS_PAUSED;
-        }
-        if(p.keyCode == 82){
+        } else if(p.keyCode == 82){
             CURRENT_SCREEN = [0, 0];
             player = new Player(24, 620, "#ff0000");
+        } else if(p.keyCode == 192 && IS_DEVMODE){
+            let screenInput = prompt("What screen would you like to go to? (x,y)");
+            let x = parseInt(screenInput.split(",")[0]);
+            let y = parseInt(screenInput.split(",")[1]);
+            CURRENT_SCREEN = [x,y];
+        } else if(p.keyCode == 9){
+            IS_MINIMAP_SHOWING = !IS_MINIMAP_SHOWING;
+            generateMinimap(CURRENT_LEVEL_JSON.stages, CURRENT_SCREEN);
+
         }
     }
 
