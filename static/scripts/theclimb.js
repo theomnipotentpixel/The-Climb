@@ -149,6 +149,19 @@ const g = p => {
         }
     }
 
+    PROPS.breakable = {
+        solidTop: true,
+        solidBottom: true,
+        solidLeft: true,
+        solidRight: true,
+        isSemisolid: false,
+        isSlippery: false,
+        changeOnTouch: true,
+        changeTo: undefined,
+        isBouncy: false,
+        forceJump: true,
+    }
+
     let ANIMATIONS_5 = {
         20: 21,
         21: 64,
@@ -210,6 +223,9 @@ const g = p => {
 
         if(id == 127)
             return PROPS.sunglasses;
+
+        if(id == 227)
+            return PROPS.breakable;
 
         return PROPS.empty;
     }
@@ -427,20 +443,21 @@ const g = p => {
             let dy = this.velY * deltaTime;
 
             let playCoin = false;
-            if(this.velX < 0){ // LEFT
-                let x1 = Math.floor((this.x + dx)/SCALE); let y1 = Math.floor(this.y/SCALE);
-                let x2 = Math.floor((this.x + dx)/SCALE); let y2 = Math.floor((this.y+SCALE-1)/SCALE);
-                
+
+            let doCollision = function(x1, y1, x2, y2, pl){
+
                 if(TILES.getProps(GetTile(x1, y1)).changeOnTouch){
                     if(TILES.getProps(GetTile(x1, y1)).sound)
                         SOUNDS[TILES.getProps(GetTile(x1, y1)).sound].play();
                     if(TILES.getProps(GetTile(x1, y1)).onHit)
                         TILES.getProps(GetTile(x1, y1)).onHit();
+                    if(TILES.getProps(GetTile(x1, y1)).forceJump)
+                        pl.velY = -pl.jumpSpeed;
+
                     CURRENT_LEVEL_JSON.setTile(
                         CURRENT_SCREEN, x1, y1,
                         TILES.getProps(GetTile(x1, y1)).changeTo
                     );
-                    
                 }
                 
                 if(TILES.getProps(GetFG(x1, y1)).changeOnTouch){
@@ -448,6 +465,9 @@ const g = p => {
                         SOUNDS[TILES.getProps(GetTile(x1, y1)).sound].play();
                     if(TILES.getProps(GetFG(x1, y1)).onHit)
                         TILES.getProps(GetFG(x1, y1)).onHit();
+                    if(TILES.getProps(GetFG(x1, y1)).forceJump)
+                        pl.velY = -pl.jumpSpeed;
+
                     CURRENT_LEVEL_JSON.setFG(
                         CURRENT_SCREEN, x1, y1,
                         TILES.getProps(GetFG(x1, y1)).changeTo
@@ -460,6 +480,9 @@ const g = p => {
                         SOUNDS[TILES.getProps(GetTile(x2, y2)).sound].play();
                     if(TILES.getProps(GetTile(x2, y2)).onHit)
                         TILES.getProps(GetTile(x2, y2)).onHit();
+                    if(TILES.getProps(GetTile(x2, y2)).forceJump)
+                        pl.velY = -pl.jumpSpeed;
+
                     CURRENT_LEVEL_JSON.setTile( 
                         CURRENT_SCREEN, x2, y2,
                         TILES.getProps(GetTile(x2, y2)).changeTo
@@ -472,12 +495,22 @@ const g = p => {
                         SOUNDS[TILES.getProps(GetTile(x2, y2)).sound].play();
                     if(TILES.getProps(GetFG(x2, y2)).onHit)
                         TILES.getProps(GetFG(x2, y2)).onHit();
+                    if(TILES.getProps(GetFG(x2, y2)).forceJump)
+                        pl.velY = -pl.jumpSpeed;
+
                     CURRENT_LEVEL_JSON.setFG( 
-                        CURRENT_SCREEN, x2, y2,
+                        CURRENT_SCREEN, x2, y2, 
                         TILES.getProps(GetFG(x2, y2)).changeTo
                     );
-                    
                 }
+
+            }
+
+            if(this.velX < 0){ // LEFT
+                let x1 = Math.floor((this.x + dx)/SCALE); let y1 = Math.floor(this.y/SCALE);
+                let x2 = Math.floor((this.x + dx)/SCALE); let y2 = Math.floor((this.y+SCALE-1)/SCALE);
+
+                doCollision(x1, y1, x2, y2, this);
 
                 if(TILES.getProps(GetTile(Math.floor((this.x + dx)/SCALE), Math.floor(this.y/SCALE))).solidRight ||
                 TILES.getProps(GetFG(Math.floor((this.x + dx)/SCALE), Math.floor(this.y/SCALE))).solidRight){
@@ -494,54 +527,8 @@ const g = p => {
             } else if (this.velX > 0){ // RIGHT
                 let x1 = Math.floor((this.x + dx + SCALE - 1)/SCALE); let y1 = Math.floor(this.y/SCALE);
                 let x2 = Math.floor((this.x + dx + SCALE - 1)/SCALE); let y2 = Math.floor((this.y+SCALE-1)/SCALE);
-                
-                if(TILES.getProps(GetTile(x1, y1)).changeOnTouch){
-                    if(TILES.getProps(GetTile(x1, y1)).sound)
-                        SOUNDS[TILES.getProps(GetTile(x1, y1)).sound].play();
-                    if(TILES.getProps(GetTile(x1, y1)).onHit)
-                        TILES.getProps(GetTile(x1, y1)).onHit();
-                    CURRENT_LEVEL_JSON.setTile(
-                        CURRENT_SCREEN, x1, y1,
-                        TILES.getProps(GetTile(x1, y1)).changeTo
-                    );
-                    
-                }
-                
-                if(TILES.getProps(GetFG(x1, y1)).changeOnTouch){
-                    if(TILES.getProps(GetFG(x1, y1)).sound)
-                        SOUNDS[TILES.getProps(GetTile(x1, y1)).sound].play();
-                    if(TILES.getProps(GetFG(x1, y1)).onHit)
-                        TILES.getProps(GetFG(x1, y1)).onHit();
-                    CURRENT_LEVEL_JSON.setFG(
-                        CURRENT_SCREEN, x1, y1,
-                        TILES.getProps(GetFG(x1, y1)).changeTo
-                    );
-                    
-                }
-                
-                if(TILES.getProps(GetTile(x2, y2)).changeOnTouch){
-                    if(TILES.getProps(GetTile(x2, y2)).sound)
-                        SOUNDS[TILES.getProps(GetTile(x2, y2)).sound].play();
-                    if(TILES.getProps(GetTile(x2, y2)).onHit)
-                        TILES.getProps(GetTile(x2, y2)).onHit();
-                    CURRENT_LEVEL_JSON.setTile( 
-                        CURRENT_SCREEN, x2, y2,
-                        TILES.getProps(GetTile(x2, y2)).changeTo
-                    );
-                    
-                }
-                
-                if(TILES.getProps(GetFG(x2, y2)).changeOnTouch){
-                    if(TILES.getProps(GetFG(x2, y2)).sound)
-                        SOUNDS[TILES.getProps(GetTile(x2, y2)).sound].play();
-                    if(TILES.getProps(GetFG(x2, y2)).onHit)
-                        TILES.getProps(GetFG(x2, y2)).onHit();
-                    CURRENT_LEVEL_JSON.setFG( 
-                        CURRENT_SCREEN, x2, y2,
-                        TILES.getProps(GetFG(x2, y2)).changeTo
-                    );
-                    
-                }
+
+                doCollision(x1, y1, x2, y2, this);
 
 
                 if(TILES.getProps(GetTile(Math.floor((this.x + dx + SCALE - 1)/SCALE), Math.floor(this.y/SCALE))).solidLeft ||
@@ -564,55 +551,8 @@ const g = p => {
             if(this.velY < 0){ // UP
                 let x1 = Math.floor((this.x)/SCALE); let y1 = Math.floor((this.y+dy)/SCALE);
                 let x2 = Math.floor((this.x+SCALE-1)/SCALE); let y2 = Math.floor((this.y+dy)/SCALE);
-                
-                if(TILES.getProps(GetTile(x1, y1)).changeOnTouch){
-                    if(TILES.getProps(GetTile(x1, y1)).sound)
-                        SOUNDS[TILES.getProps(GetTile(x1, y1)).sound].play();
-                    if(TILES.getProps(GetTile(x1, y1)).onHit)
-                        TILES.getProps(GetTile(x1, y1)).onHit();
-                    CURRENT_LEVEL_JSON.setTile(
-                        CURRENT_SCREEN, x1, y1,
-                        TILES.getProps(GetTile(x1, y1)).changeTo
-                    );
-                    
-                }
-                
-                if(TILES.getProps(GetFG(x1, y1)).changeOnTouch){
-                    if(TILES.getProps(GetFG(x1, y1)).sound)
-                        SOUNDS[TILES.getProps(GetTile(x1, y1)).sound].play();
-                    if(TILES.getProps(GetFG(x1, y1)).onHit)
-                        TILES.getProps(GetFG(x1, y1)).onHit();
-                    CURRENT_LEVEL_JSON.setFG(
-                        CURRENT_SCREEN, x1, y1,
-                        TILES.getProps(GetFG(x1, y1)).changeTo
-                    );
-                    
-                }
-                
-                if(TILES.getProps(GetTile(x2, y2)).changeOnTouch){
-                    if(TILES.getProps(GetTile(x2, y2)).sound)
-                        SOUNDS[TILES.getProps(GetTile(x2, y2)).sound].play();
-                    if(TILES.getProps(GetTile(x2, y2)).onHit)
-                        TILES.getProps(GetTile(x2, y2)).onHit();
-                    CURRENT_LEVEL_JSON.setTile( 
-                        CURRENT_SCREEN, x2, y2,
-                        TILES.getProps(GetTile(x2, y2)).changeTo
-                    );
-                    
-                }
-                
-                if(TILES.getProps(GetFG(x2, y2)).changeOnTouch){
-                    if(TILES.getProps(GetFG(x2, y2)).sound)
-                        SOUNDS[TILES.getProps(GetTile(x2, y2)).sound].play();
-                    if(TILES.getProps(GetFG(x2, y2)).onHit)
-                        TILES.getProps(GetFG(x2, y2)).onHit();
-                    CURRENT_LEVEL_JSON.setFG( 
-                        CURRENT_SCREEN, x2, y2,
-                        TILES.getProps(GetFG(x2, y2)).changeTo
-                    );
-                    
-                }
-                
+
+                doCollision(x1, y1, x2, y2, this);
 
                 if(TILES.getProps(GetTile(Math.floor((this.x)/SCALE), Math.floor((this.y+dy)/SCALE))).solidBottom ||
                 TILES.getProps(GetFG(Math.floor((this.x)/SCALE), Math.floor((this.y+dy)/SCALE))).solidBottom){
@@ -633,53 +573,7 @@ const g = p => {
                 let t2m = TILES.getProps(GetTile(Math.floor((this.x+SCALE-1)/SCALE), Math.ceil((this.y+dy)/SCALE)));
                 let t2f = TILES.getProps(GetFG(Math.floor((this.x+SCALE-1)/SCALE), Math.ceil((this.y+dy)/SCALE)));
                 
-                if(TILES.getProps(GetTile(x1, y1)).changeOnTouch){
-                    if(TILES.getProps(GetTile(x1, y1)).sound)
-                        SOUNDS[TILES.getProps(GetTile(x1, y1)).sound].play();
-                    if(TILES.getProps(GetTile(x1, y1)).onHit)
-                        TILES.getProps(GetTile(x1, y1)).onHit();
-                    CURRENT_LEVEL_JSON.setTile(
-                        CURRENT_SCREEN, x1, y1,
-                        TILES.getProps(GetTile(x1, y1)).changeTo
-                    );
-                    
-                }
-                
-                if(TILES.getProps(GetFG(x1, y1)).changeOnTouch){
-                    if(TILES.getProps(GetFG(x1, y1)).sound)
-                        SOUNDS[TILES.getProps(GetTile(x1, y1)).sound].play();
-                    if(TILES.getProps(GetFG(x1, y1)).onHit)
-                        TILES.getProps(GetFG(x1, y1)).onHit();
-                    CURRENT_LEVEL_JSON.setFG(
-                        CURRENT_SCREEN, x1, y1,
-                        TILES.getProps(GetFG(x1, y1)).changeTo
-                    );
-                    
-                }
-                
-                if(TILES.getProps(GetTile(x2, y2)).changeOnTouch){
-                    if(TILES.getProps(GetTile(x2, y2)).sound)
-                        SOUNDS[TILES.getProps(GetTile(x2, y2)).sound].play();
-                    if(TILES.getProps(GetTile(x2, y2)).onHit)
-                        TILES.getProps(GetTile(x2, y2)).onHit();
-                    CURRENT_LEVEL_JSON.setTile( 
-                        CURRENT_SCREEN, x2, y2,
-                        TILES.getProps(GetTile(x2, y2)).changeTo
-                    );
-                    
-                }
-                
-                if(TILES.getProps(GetFG(x2, y2)).changeOnTouch){
-                    if(TILES.getProps(GetFG(x2, y2)).sound)
-                        SOUNDS[TILES.getProps(GetTile(x2, y2)).sound].play();
-                    if(TILES.getProps(GetFG(x2, y2)).onHit)
-                        TILES.getProps(GetFG(x2, y2)).onHit();
-                    CURRENT_LEVEL_JSON.setFG( 
-                        CURRENT_SCREEN, x2, y2,
-                        TILES.getProps(GetFG(x2, y2)).changeTo
-                    );
-                    
-                }
+                doCollision(x1, y1, x2, y2, this);
 
                 if(
                     (t1m.solidTop && !(t1m.isSemisolid && !t1m.solidBottom && this.downIsPressed)) ||
