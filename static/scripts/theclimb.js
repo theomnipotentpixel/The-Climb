@@ -48,7 +48,10 @@ const g = p => {
     let DEBUG_MODE = false;
     let IS_PAUSED = false;
     let IS_MINIMAP_SHOWING = false;
+    let IS_HUD_SHOWING = true;
     let minimap = null;
+    let FONT;
+    let TIME_SINCE_START = 0;
 
     let LEVELS_LOADED = false;
     let CURRENT_LEVEL_JSON = null;
@@ -117,7 +120,10 @@ const g = p => {
         changeOnTouch: true,
         changeTo: undefined,
         isBouncy: false,
-        sound: "coin"
+        sound: "coin",
+        onHit: function(){
+            player.coins++;
+        }
     }
 
     PROPS.spring = {
@@ -160,6 +166,32 @@ const g = p => {
         changeTo: undefined,
         isBouncy: false,
         forceJump: true,
+    };
+
+    PROPS.key = {
+        solidTop: false,
+        solidBottom: false,
+        solidLeft: false,
+        solidRight: false,
+        isSemisolid: false,
+        isSlippery: false,
+        changeOnTouch: true,
+        isBouncy: false,
+        changeTo: undefined,
+        onHit: function(){
+            player.keys++;
+        }
+    }
+
+    PROPS.locked = {
+        solidTop: true,
+        solidBottom: true,
+        solidLeft: true,
+        solidRight: true,
+        isSemisolid: false,
+        isSlippery: false,
+        isBouncy: false,
+        needsKey: true
     }
 
     let ANIMATIONS_5 = {
@@ -226,6 +258,12 @@ const g = p => {
 
         if(id == 227)
             return PROPS.breakable;
+
+        if(id == 230)
+            return PROPS.key;
+
+        if(id == 231)
+            return PROPS.locked;
 
         return PROPS.empty;
     }
@@ -398,6 +436,8 @@ const g = p => {
         this.isOnGround = false;
         this.isLeft = false;
         this.hasSunglasses = false;
+        this.keys = 0;
+        this.coins = 0;
 
         this.update = function(deltaTime){
             if(deltaTime > 0.1)
@@ -452,12 +492,21 @@ const g = p => {
                     if(TILES.getProps(GetTile(x1, y1)).onHit)
                         TILES.getProps(GetTile(x1, y1)).onHit();
                     if(TILES.getProps(GetTile(x1, y1)).forceJump)
-                        pl.velY = -pl.jumpSpeed;
+                        pl.velY = -pl.jumpSpeed/2;
 
                     CURRENT_LEVEL_JSON.setTile(
                         CURRENT_SCREEN, x1, y1,
                         TILES.getProps(GetTile(x1, y1)).changeTo
                     );
+                }
+
+                if(TILES.getProps(GetTile(x1, y1)).needsKey){
+                    if(pl.keys > 0){
+                        CURRENT_LEVEL_JSON.setTile(
+                            CURRENT_SCREEN, x1, y1, undefined
+                        );
+                        pl.keys--;
+                    }
                 }
                 
                 if(TILES.getProps(GetFG(x1, y1)).changeOnTouch){
@@ -466,13 +515,21 @@ const g = p => {
                     if(TILES.getProps(GetFG(x1, y1)).onHit)
                         TILES.getProps(GetFG(x1, y1)).onHit();
                     if(TILES.getProps(GetFG(x1, y1)).forceJump)
-                        pl.velY = -pl.jumpSpeed;
+                        pl.velY = -pl.jumpSpeed/2;
 
                     CURRENT_LEVEL_JSON.setFG(
                         CURRENT_SCREEN, x1, y1,
                         TILES.getProps(GetFG(x1, y1)).changeTo
                     );
-                    
+                }
+
+                if(TILES.getProps(GetFG(x1, y1)).needsKey){
+                    if(pl.keys > 0){
+                        CURRENT_LEVEL_JSON.setFG(
+                            CURRENT_SCREEN, x1, y1, undefined
+                        );
+                        pl.keys--;
+                    }
                 }
                 
                 if(TILES.getProps(GetTile(x2, y2)).changeOnTouch){
@@ -481,13 +538,21 @@ const g = p => {
                     if(TILES.getProps(GetTile(x2, y2)).onHit)
                         TILES.getProps(GetTile(x2, y2)).onHit();
                     if(TILES.getProps(GetTile(x2, y2)).forceJump)
-                        pl.velY = -pl.jumpSpeed;
+                        pl.velY = -pl.jumpSpeed/2;
 
                     CURRENT_LEVEL_JSON.setTile( 
                         CURRENT_SCREEN, x2, y2,
                         TILES.getProps(GetTile(x2, y2)).changeTo
                     );
-                    
+                }
+
+                if(TILES.getProps(GetTile(x2, y2)).needsKey){
+                    if(pl.keys > 0){
+                        CURRENT_LEVEL_JSON.setTile(
+                            CURRENT_SCREEN, x2, y2, undefined
+                        );
+                        pl.keys--;
+                    }
                 }
                 
                 if(TILES.getProps(GetFG(x2, y2)).changeOnTouch){
@@ -496,12 +561,21 @@ const g = p => {
                     if(TILES.getProps(GetFG(x2, y2)).onHit)
                         TILES.getProps(GetFG(x2, y2)).onHit();
                     if(TILES.getProps(GetFG(x2, y2)).forceJump)
-                        pl.velY = -pl.jumpSpeed;
+                        pl.velY = -pl.jumpSpeed/2;
 
                     CURRENT_LEVEL_JSON.setFG( 
                         CURRENT_SCREEN, x2, y2, 
                         TILES.getProps(GetFG(x2, y2)).changeTo
                     );
+                }
+
+                if(TILES.getProps(GetFG(x2, y2)).needsKey){
+                    if(pl.keys > 0){
+                        CURRENT_LEVEL_JSON.setFG(
+                            CURRENT_SCREEN, x2, y2, undefined
+                        );
+                        pl.keys--;
+                    }
                 }
 
             }
@@ -568,12 +642,13 @@ const g = p => {
             } else if(this.velY > 0){ // DOWN
                 let x1 = Math.floor((this.x)/SCALE); let y1 = Math.ceil((this.y+dy)/SCALE);
                 let x2 = Math.floor((this.x+SCALE-1)/SCALE); let y2 = Math.ceil((this.y+dy)/SCALE);
+                
+                doCollision(x1, y1, x2, y2, this);
+
                 let t1m = TILES.getProps(GetTile(Math.floor((this.x)/SCALE), Math.ceil((this.y+dy)/SCALE)));
                 let t1f = TILES.getProps(GetFG(Math.floor((this.x)/SCALE), Math.ceil((this.y+dy)/SCALE)));
                 let t2m = TILES.getProps(GetTile(Math.floor((this.x+SCALE-1)/SCALE), Math.ceil((this.y+dy)/SCALE)));
                 let t2f = TILES.getProps(GetFG(Math.floor((this.x+SCALE-1)/SCALE), Math.ceil((this.y+dy)/SCALE)));
-                
-                doCollision(x1, y1, x2, y2, this);
 
                 if(
                     (t1m.solidTop && !(t1m.isSemisolid && !t1m.solidBottom && this.downIsPressed)) ||
@@ -674,13 +749,17 @@ const g = p => {
         this.saveData = function(){
             return {
                 x: this.x,
-                y: this.y
+                y: this.y,
+                keys: this.keys,
+                coins: this.coins,
             };
         }
 
         this.loadData = function(data){
             this.x = data.x;
             this.y = data.y;
+            this.keys = data.keys ?? 0;
+            this.coins = data.coins ?? 0;
         }
     }
 
@@ -710,6 +789,8 @@ const g = p => {
         loadLevelPack();
         p.createCanvas(SCREEN_WIDTH, SCREEN_HEIGHT);
         player = new Player(24, 620, "#ff0000");
+        FONT = p.loadFont('/fonts/main.ttf');
+        p.textFont(FONT);
         tileset = SPRITES.tileset;
         backgroundSprite = SPRITES.sky;
         p.background(62);
@@ -740,13 +821,44 @@ const g = p => {
         
     }
 
+    function screen_hudOverlay(){
+        let keyIcon = 230;
+        let iX = keyIcon % 8;
+        let iY = Math.floor(keyIcon / 8);
+        p.image(SPRITES.tileset, SCREEN_WIDTH-SCALE*5, 16, SCALE, SCALE, iX*SCALE, iY*SCALE, SCALE, SCALE);
+
+        let coinIcon = 160;
+        iX = coinIcon % 8;
+        iY = Math.floor(coinIcon / 8);
+        p.image(SPRITES.tileset, 16, 16, SCALE, SCALE, iX*SCALE, iY*SCALE, SCALE, SCALE);
+
+        p.textAlign(p.LEFT, p.TOP);
+        p.textSize(SCALE);
+        p.text(`: ${player.coins}`, 44, 16);
+        p.text(`: ${player.keys}`, SCREEN_WIDTH-SCALE*5 + SCALE + 4, 16);
+
+        p.textAlign(p.LEFT, p.TOP);
+        let millis = (""+(Math.floor(TIME_SINCE_START) % 1000)).padStart(3, "0");
+        let secs = (""+(Math.floor(TIME_SINCE_START / 1000) % 60)).padStart(2, "0");
+        let mins = (""+(Math.floor(TIME_SINCE_START / 1000 / 60) % 60)).padStart(2, "0");
+        let hours = ""+(Math.floor(TIME_SINCE_START / 1000 / 60 / 60) % 60);
+        p.text(`${hours}:${mins}:${secs}.${millis}`, SCREEN_WIDTH / 2 - SCALE*3, 16)
+    }
+
     function screen_playGame(){
+
         p.noStroke();
         p.background(0x11, 0x1d, 0x35);
         p.image(SPRITES.sky, 0, 0, 720, 720, 0, 960-360+CURRENT_SCREEN[1]*40, 360, 360);
+
+        if(IS_HUD_SHOWING)
+            screen_hudOverlay();
+
         handleTouches();
-        if(!IS_PAUSED)
+        if(!IS_PAUSED){
             player.update(p.deltaTime/1000);
+            TIME_SINCE_START += p.deltaTime;
+        }
         for(let i = 0; i <= LAST_TILE_X; i++){
             for(let j = 0; j <= LAST_TILE_Y; j++){
                 let curTile = GetBG(i, j);
@@ -828,6 +940,7 @@ const g = p => {
         } else if(p.keyCode == 82){
             CURRENT_SCREEN = [0, 0];
             player = new Player(24, 620, "#ff0000");
+            TIME_SINCE_START = 0;
         } else if(p.keyCode == 192 && IS_DEVMODE){
             let screenInput = prompt("What screen would you like to go to? (x,y)");
             let x = parseInt(screenInput.split(",")[0]);
@@ -838,6 +951,8 @@ const g = p => {
             IS_MINIMAP_SHOWING = !IS_MINIMAP_SHOWING;
             if(IS_MINIMAP_SHOWING)
                 initMinimap();
+        } else if(p.keyCode == 72){
+            IS_HUD_SHOWING = !IS_HUD_SHOWING;
         }
     }
 
@@ -926,13 +1041,15 @@ const g = p => {
             } catch {
 
             }
+
+        TIME_SINCE_START = parseFloat(localStorage.getItem("tss")) ?? 0;
     }
 
     function onSave(){
         localStorage.setItem("config", JSON.stringify(CONFIG));
         localStorage.setItem("pd", JSON.stringify(player.saveData()));
         localStorage.setItem("cs", JSON.stringify(CURRENT_SCREEN));
-
+        localStorage.setItem("tss", TIME_SINCE_START+"");
     }
 }
 
