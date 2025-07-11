@@ -851,9 +851,6 @@ const g = p => {
         p.background(0x11, 0x1d, 0x35);
         p.image(SPRITES.sky, 0, 0, 720, 720, 0, 960-360+CURRENT_SCREEN[1]*40, 360, 360);
 
-        if(IS_HUD_SHOWING)
-            screen_hudOverlay();
-
         handleTouches();
         if(!IS_PAUSED){
             player.update(p.deltaTime/1000);
@@ -896,6 +893,10 @@ const g = p => {
             p.image(minimap.gfx, SCREEN_WIDTH/2, SCREEN_HEIGHT/2);
             p.imageMode(p.CORNER);
         }
+        
+        if(IS_HUD_SHOWING)
+            screen_hudOverlay();
+        
         if(!IS_PAUSED){
             if(p.frameCount % 5 == 0){
                 doAnims(ANIMATIONS_5);
