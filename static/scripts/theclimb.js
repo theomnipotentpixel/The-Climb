@@ -1043,7 +1043,15 @@ const g = p => {
 
             }
 
-        TIME_SINCE_START = parseFloat(localStorage.getItem("tss")) ?? 0;
+
+            
+        let TIME_SINCE_START = localStorage.getItem("tss");
+        
+        if(TIME_SINCE_START == null){
+            TIME_SINCE_START = 0;
+        } else {
+            TIME_SINCE_START = parseFloat(TIME_SINCE_START);
+        }
     }
 
     function onSave(){
